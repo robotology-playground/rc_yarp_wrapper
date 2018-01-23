@@ -15,11 +15,7 @@ ImageOf<PixelMono> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int
     ImageOf<PixelMono> yarpReturnImage;
     // prepare file name
 
-    std::ostringstream name;
-
     double t=buffer->getTimestampNS()/1000000000.0;
-
-    name << "image_" << std::setprecision(16) << t;
 
     // store image (see e.g. the sv tool of cvkit for show images)
 
@@ -44,68 +40,6 @@ ImageOf<PixelMono> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int
 
         yarpReturnImage.wrapIplImage(image2);
 
-        /*
-        size_t px=buffer->getXPadding();
-
-        uint64_t format=buffer->getPixelFormat();
-
-        switch (format)
-        {
-        case Mono8: // store 8 bit monochrome image
-        case Confidence8:
-        case Error8:
-        {
-            if (format == Mono8)
-            {
-                name << "_mono.pgm";
-                //TODO: export image to monochrome port
-            }
-            else if (format == Confidence8)
-            {
-                name << "_conf.pgm";
-            }
-            else if (format == Error8)
-            {
-                name << "_err.pgm";
-            }
-        }
-            break;
-
-        case Coord3D_C16: // store 16 bit monochrome image
-        {
-            name << "_disp.pgm";
-            std::ofstream out(name.str(), std::ios::binary);
-
-            out << "P5" << std::endl;
-            out << width << " " << height << std::endl;
-            out << 65535 << "\n";
-
-//            std::streambuf *sb=out.rdbuf();
-
-            // copy image data, pgm is always big endian
-            //TODO: export image to disparity port
-
-            if (buffer->isBigEndian())
-            {
-
-            }
-            else
-            {
-
-            }
-
-//            out.close();
-        }
-            break;
-
-        default:
-            std::cerr << "storeBuffer(): Unknown pixel format: "
-                      << GetPixelFormatName(static_cast<PfncFormat>(buffer->getPixelFormat()))
-                      << std::endl;
-            return yarpReturnImage;
-            break;
-        }
-        */
     }
     else if (!buffer->getImagePresent())
     {
@@ -218,6 +152,7 @@ bool    rcYarpWrapper::interruptModule()
 
     port_depth.interrupt();
     port_mono.interrupt();
+    port_conf.interrupt();
     return true;
 }
 
@@ -230,6 +165,7 @@ bool    rcYarpWrapper::close()
     rcg::System::clearSystems();
     port_depth.close();
     port_mono.close();
+    port_conf.close();
     return true;
 }
 
