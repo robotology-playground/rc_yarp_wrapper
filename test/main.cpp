@@ -241,8 +241,9 @@ int main(int argc, char *argv[])
     options.fromCommand(argc,argv);
     // Set the name of the port (use "/worker" if there is no --name option)
     ConstString portName = options.check("name",Value("/worker")).asString();
-    port_mono.open("/worker_mono");
-    port_depth.open("/worker_depth");
+    std::string name = options.check("name",Value("rc_img_conveyor")).asString().c_str();
+    port_mono.open(("/"+name+"/mono").c_str());
+    port_depth.open(("/"+name+"/depth").c_str());
 
     try
     {
