@@ -1,0 +1,108 @@
+<application>
+<name>rcCamera with Skeleton3D </name>
+
+    <!--OPC and related modules-->
+    <module>
+       <name>objectsPropertiesCollector</name>
+       <parameters>--name OPC --no-load-db --no-save-db</parameters>
+       <node>icub21</node>
+    </module>
+
+     <!--SFM modules-->
+    <module>
+        <name>skeleton2D.py</name>
+        <parameters>--des /skeleton2D</parameters>
+        <node>icub-cuda</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /mono --x 960 --y 720 --p 50 --autosize</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /depth --x 960 --y 720 --p 50</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /confidence --x 960 --y 720 --p 50</parameters>
+        <node>localhost</node>
+    </module>
+
+    <!--Skeleton modules-->
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /dispSkeleton:i --x 960 --y 370 --p 50</parameters>
+        <node>icub22</node>
+    </module>
+    <module>
+        <name>skeleton3D</name>
+        <parameters>--dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 9 --use_part_conf 0 --period 0.01 --body_valence 0.0</parameters>
+        <dependencies>
+            <port timeout="10">/OPC/rpc</port>
+            <port timeout="10">/SFM/rpc</port>
+            <port timeout="10">/skeleton2D/bodyParts:o</port>
+        </dependencies>
+        <node>icub21</node>
+    </module>
+    <!--PPS modules-->
+
+
+    <!--GUI modules-->
+    <module>
+        <name>guiUpdater</name>
+        <parameters>--displaySkeletons 1</parameters>
+        <dependencies>
+            <port timeout="10">/OPC/rpc</port>
+        </dependencies>
+        <node>icub21</node>
+    </module>
+
+
+
+	<ensure>
+		<wait>5.0</wait>
+	</ensure>
+
+    <!--PPS connections-->
+
+
+
+    <!--Skeleton connections-->
+    <connection>
+        <from>/skeleton2D/dispSkeleton:o</from>
+        <to>/dispSkeleton:i</to>
+        <protocol>udp</protocol>
+    </connection>
+
+    <connection>
+        <from>/skeleton2D/bodyParts:o</from>
+        <to>/skeleton3D/bodyParts:i</to>
+        <protocol>udp</protocol>
+    </connection>
+
+    <connection>
+        <from>/rc_img_conveyor/mono</from>
+        <to>/mono</to>
+        <protocol>udp</protocol>
+    </connection>
+
+    <connection>
+        <from>/rc_img_conveyor/depth</from>
+        <to>/depth</to>
+        <protocol>udp</protocol>
+    </connection>
+
+    <connection>
+        <from>/rc_img_conveyor/confidence</from>
+        <to>/confidence</to>
+        <protocol>udp</protocol>
+    </connection>
+
+</application>
+
+

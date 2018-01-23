@@ -39,7 +39,7 @@ set(main_project_path ${CMAKE_CURRENT_SOURCE_DIR})
 
 #add_subdirectory(modules)
 
-#add_subdirectory(app)
+add_subdirectory(app)
 add_subdirectory(test)
 add_subdirectory(rc_yarp_wrapper)
 
