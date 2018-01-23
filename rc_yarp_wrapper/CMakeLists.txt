@@ -9,15 +9,16 @@ project(rc_yarp_wrapper)
 
 include(YarpIDL)
 
-file(GLOB source *.cpp)
-file(GLOB header *.h)
+#file(GLOB source *.cpp)
+#file(GLOB header *.h)
 
-#set (include_files	${CMAKE_CURRENT_SOURCE_DIR}/skeleton3D.h)
+set (include_files	${CMAKE_CURRENT_SOURCE_DIR}/rcYarpWrapper.h)
 
 
-set (source_files 	#${CMAKE_CURRENT_SOURCE_DIR}/skeleton3D.cpp
-					${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
-
+set (source_files 	${CMAKE_CURRENT_SOURCE_DIR}/rcYarpWrapper.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/runModule.cpp
+#                        ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+                        )
 include_directories(${OpenCV_INCLUDE_DIRS}
 					#${RC_GENICAM_API_DIRS}
 					#${RC_GENICAM_API_LIBRARIES}
