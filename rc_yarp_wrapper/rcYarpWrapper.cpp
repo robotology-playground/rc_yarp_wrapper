@@ -62,7 +62,7 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
 
     bool getMono = rf.check("mono",Value(1)).asBool();
     bool getCombined = rf.check("combined",Value(0)).asBool();
-    bool getDepth = rf.check("depth",Value(1)).asBool();
+    bool getDisp = rf.check("disp",Value(1)).asBool();
     bool getError = rf.check("error",Value(0)).asBool();
     bool getConfidence = rf.check("confidence",Value(0)).asBool();
 
@@ -79,8 +79,9 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
         dev->open(rcg::Device::CONTROL);
         std::shared_ptr<GenApi::CNodeMapRef> nodemap=dev->getRemoteNodeMap();
 
+        // Set stream outputs
         rcg::setEnum(nodemap, "ComponentSelector", "Disparity", true);
-        rcg::setBoolean(nodemap, "ComponentEnable", getDepth, true);
+        rcg::setBoolean(nodemap, "ComponentEnable", getDisp, true);
         rcg::setEnum(nodemap, "ComponentSelector", "Intensity", true);
         rcg::setBoolean(nodemap, "ComponentEnable", getMono, true);
         rcg::setEnum(nodemap, "ComponentSelector", "IntensityCombined", true);
@@ -116,8 +117,14 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
             }
         }
 
+        // get focal length, baseline and disparity scale factor
+
+        focalLength=rcg::getFloat(nodemap, "FocalLengthFactor", 0, 0, false);
+        baseLine=rcg::getFloat(nodemap, "Baseline", 0, 0, true);
+        dispScale=rcg::getFloat(nodemap, "Scan3dCoordinateScale", 0, 0, true);
+
         port_mono.open(("/"+name+"/mono").c_str());
-        port_depth.open(("/"+name+"/depth").c_str());
+        port_disp.open(("/"+name+"/disp").c_str());
         port_conf.open(("/"+name+"/confidence").c_str());
 
         // open stream and get images
@@ -154,7 +161,7 @@ bool    rcYarpWrapper::interruptModule()
         stream[0]->stopStreaming();
         stream[0]->close();
     }
-    port_depth.interrupt();
+    port_disp.interrupt();
     port_mono.interrupt();
     port_conf.interrupt();
     return true;
@@ -164,7 +171,7 @@ bool    rcYarpWrapper::close()
 {
     yDebug("[%s] closing module",name.c_str());
 //    rpcPort.close();
-    port_depth.close();
+    port_disp.close();
     port_mono.close();
     port_conf.close();
     dev->close();
@@ -222,8 +229,8 @@ bool    rcYarpWrapper::updateModule()
 
                     // copy image data, pgm is always big endian
                     //TODO: export image to disparity port
-                    port_depth.prepare() = img;
-                    port_depth.write();
+                    port_disp.prepare() = img;
+                    port_disp.write();
                     if (buffer->isBigEndian())
                     {
 

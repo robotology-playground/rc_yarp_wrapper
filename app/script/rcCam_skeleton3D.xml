@@ -17,13 +17,13 @@
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /mono --x 960 --y 720 --p 50 --autosize</parameters>
+        <parameters>--name /mono --x 320 --y 720 --p 50 --autosize</parameters>
         <node>localhost</node>
     </module>
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /depth --x 960 --y 720 --p 50</parameters>
+        <parameters>--name /disp --x 640 --y 720 --p 50</parameters>
         <node>localhost</node>
     </module>
 
@@ -92,8 +92,8 @@
     </connection>
 
     <connection>
-        <from>/rc_img_conveyor/depth</from>
-        <to>/depth</to>
+        <from>/rc_img_conveyor/disp</from>
+        <to>/disp</to>
         <protocol>udp</protocol>
     </connection>
 

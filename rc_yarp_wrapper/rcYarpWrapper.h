@@ -33,9 +33,13 @@ protected:
     double          period;
     std::string     name;       //!< module name
     int             scale;      //!< scale factor to resize original image
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono> > port_mono, port_depth, port_conf;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono> > port_mono, port_disp, port_conf;
     std::shared_ptr<rcg::Device>                dev;
     std::vector<std::shared_ptr<rcg::Stream> >  stream;
+
+    double          focalLength;//!< camera focalLength
+    double          baseLine;   //!< camera baseline
+    double          dispScale;  //!< disparity scale factor
 
     bool    configure(yarp::os::ResourceFinder &rf);
     bool    interruptModule();
