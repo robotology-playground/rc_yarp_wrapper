@@ -9,6 +9,57 @@ using namespace yarp::math;
 //{
 
 //}
+bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono> dispImg, const Vector &tlPixel,
+                                      const Vector &brPixel, const int &step,
+                                      Vector &point3D)
+{
+    int cnt=0;
+    for (int u=tlPixel[0]; u<brPixel[0]; u+=step)   //row
+    {
+        for (int v=tlPixel[1]; v<brPixel[1]; v+=step)     //column
+        {
+            Vector pointTemp(3,0.0);
+            Vector pixel(2,0.0);
+            pixel[0] = u;   pixel[1] = v;
+            if (compute3DCoor(dispImg,pixel,pointTemp))
+            {
+                point3D+=pointTemp;
+                cnt++;
+            }
+        }
+    }
+    if (cnt>0)
+        point3D/=cnt;
+}
+
+bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono> dispImg, const Vector &pixel,
+                                  Vector &point3D)
+{
+    if (pixel.size()==2)
+    {
+        double imgW = double(dispImg.width());
+        double imgH = double(dispImg.height());
+        point3D.resize(3);
+        int disp = dispImg.pixel(pixel[0],pixel[1]);
+        double d = double(disp);
+        point3D[0] = pixel[0]*baseLine/d;
+        point3D[1] = pixel[1]*baseLine/d;
+        point3D[2] = focalLength*imgW*baseLine/d;
+
+//        yInfo("focalLength: %f",focalLength);
+//        yInfo("baseline: %f",baseLine);
+//        yInfo("dispScale: %f",dispScale);
+//        yInfo("disparity at pixel [%s]: %d",pixel.toString(3,3).c_str(), disp);
+//        yInfo("img width, height: %f, %f",imgW, imgH);
+//        yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
+//              point3D.toString(3,3).c_str());
+
+        return true;
+    }
+    else
+        return false;
+}
+
 ImageOf<PixelMono> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int &_scale)
 {
 
@@ -29,8 +80,12 @@ ImageOf<PixelMono> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int
         int scale = _scale;
 
         image.data = (unsigned char*) p;
-        yInfo() <<"width "<< image.cols;
-        yInfo() <<"height "<< image.rows;
+//        yInfo() <<"width "<< image.cols;
+//        yInfo() <<"height "<< image.rows;
+        uint64_t format=buffer->getPixelFormat();
+        if (format == Coord3D_C16)
+            scale = 1;
+
         cv::resize(image, dst, cv::Size(int(height/scale),int(width/scale)));
 
         IplImage* image2;
@@ -231,6 +286,16 @@ bool    rcYarpWrapper::updateModule()
                     //TODO: export image to disparity port
                     port_disp.prepare() = img;
                     port_disp.write();
+                    Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);
+                    pixel[0] = 240; //row
+                    pixel[1] = 320; //col
+//                    compute3DCoor(img,pixel, pt3D);
+
+                    p_tl = pixel-3;
+                    p_br = pixel+3;
+                    compute3DCoorRect(img,p_tl,p_br,2,pt3D);
+                    yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
+                          pt3D.toString(3,3).c_str());
                     if (buffer->isBigEndian())
                     {
 

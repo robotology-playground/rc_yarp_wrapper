@@ -48,6 +48,11 @@ protected:
     double  getPeriod();
     bool    updateModule();
 public:
+    bool compute3DCoor(yarp::sig::ImageOf<yarp::sig::PixelMono> dispImg, const yarp::sig::Vector &pixel,
+                       yarp::sig::Vector &point3D);
+    bool compute3DCoorRect(yarp::sig::ImageOf<yarp::sig::PixelMono> dispImg, const yarp::sig::Vector &tlPixel,
+                           const yarp::sig::Vector &brPixel, const int &step,
+                           yarp::sig::Vector &point3D);
     yarp::sig::ImageOf<yarp::sig::PixelMono> getBuffer(const rcg::Buffer *buffer, const int &_scale);
 //    rcYarpWrapper();
 };
