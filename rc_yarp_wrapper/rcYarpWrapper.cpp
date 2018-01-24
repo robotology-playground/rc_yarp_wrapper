@@ -149,7 +149,11 @@ bool    rcYarpWrapper::interruptModule()
 {
     yDebug("[%s] Interupt module",name.c_str());
 //    rpcPort.interrupt();
-
+    if (stream.size()>0)
+    {
+        stream[0]->stopStreaming();
+        stream[0]->close();
+    }
     port_depth.interrupt();
     port_mono.interrupt();
     port_conf.interrupt();
@@ -160,12 +164,12 @@ bool    rcYarpWrapper::close()
 {
     yDebug("[%s] closing module",name.c_str());
 //    rpcPort.close();
-
-    dev->close();
-    rcg::System::clearSystems();
     port_depth.close();
     port_mono.close();
     port_conf.close();
+    dev->close();
+    rcg::System::clearSystems();
+
     return true;
 }
 
@@ -189,20 +193,6 @@ bool    rcYarpWrapper::updateModule()
             if (img.getRowSize()>0)
             {
                 uint64_t format=buffer->getPixelFormat();
-//                if (img.getRowSize()==int(960/scale) || img.getRowSize()==int(1920/scale))
-//                {
-////                        yDebug("mono image");
-
-//                    port_mono.prepare() = img;
-//                    port_mono.write();
-//                }
-//                else if (img.getRowSize()==int(480/scale) && format==Confidence8)
-//                {
-//                    yDebug("depth image");
-
-//                    port_depth.prepare() = img;
-//                    port_depth.write();
-//                }
                 switch (format)
                 {
                 case Mono8: // store 8 bit monochrome image
