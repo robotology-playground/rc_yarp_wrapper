@@ -57,8 +57,6 @@ public:
 ////    yarp::sig::ImageOf<T> getBuffer(const rcg::Buffer *buffer, const int &_scale);
 //    bool getBuffer(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<T> &yarpReturnImage);
 
-//    yarp::sig::ImageOf<yarp::sig::PixelMono> getBuffer8(const rcg::Buffer *buffer, const int &_scale);
-//    yarp::sig::ImageOf<yarp::sig::PixelMono16> getBuffer16(const rcg::Buffer *buffer, const int &_scale);
     bool getBuffer8(const rcg::Buffer *buffer, const int &_scale,
                     yarp::sig::ImageOf<yarp::sig::PixelMono> &yarpReturnImage);
     bool getBuffer16(const rcg::Buffer *buffer, const int &_scale,

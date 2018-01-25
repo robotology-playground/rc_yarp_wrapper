@@ -150,15 +150,10 @@ bool rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int &_scale, Imag
 */
 
 bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono> &yarpReturnImage)
-//ImageOf<PixelMono> rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale)
 {
-
-//    ImageOf<PixelMono> yarpReturnImage;
     // prepare file name
 
     double t=buffer->getTimestampNS()/1000000000.0;
-
-    // store image (see e.g. the sv tool of cvkit for show images)
 
     if (!buffer->getIsIncomplete() && buffer->getImagePresent())
     {
@@ -191,28 +186,19 @@ bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yar
     {
         yError() << "getBuffer(): Received buffer without image";
         return false;
-//        return yarpReturnImage;
     }
     else if (buffer->getIsIncomplete())
     {
         yError() << "getBuffer(): Received buffer without image";
         return false;
-//        return yarpReturnImage;
     }
     return true;
-//    return yarpReturnImage;
 }
 
 bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono16> &yarpReturnImage)
-//ImageOf<PixelMono16> rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale)
 {
-
-//    ImageOf<PixelMono16> yarpReturnImage;
     // prepare file name
-
     double t=buffer->getTimestampNS()/1000000000.0;
-
-    // store image (see e.g. the sv tool of cvkit for show images)
 
     if (!buffer->getIsIncomplete() && buffer->getImagePresent())
     {
@@ -249,7 +235,6 @@ bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, ya
         yError() << "getBuffer(): Received buffer without image";
         return false;
     }
-//    return yarpReturnImage;
     return true;
 }
 
