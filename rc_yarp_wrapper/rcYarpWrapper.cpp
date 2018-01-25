@@ -360,11 +360,6 @@ bool    rcYarpWrapper::interruptModule()
 {
     yDebug("[%s] Interupt module",name.c_str());
 //    rpcPort.interrupt();
-    if (dev && stream.size()>0)
-    {
-        stream[0]->stopStreaming();
-        stream[0]->close();
-    }
     port_disp.interrupt();
     port_mono.interrupt();
     port_conf.interrupt();
@@ -378,8 +373,13 @@ bool    rcYarpWrapper::close()
     port_disp.close();
     port_mono.close();
     port_conf.close();
-    if (dev)
-        dev->close();
+    if (dev && stream.size()>0)
+    {
+        stream[0]->stopStreaming();
+        stream[0]->close();
+
+    }
+    dev->close();
     rcg::System::clearSystems();
 
     return true;
