@@ -9,7 +9,7 @@ using namespace yarp::math;
 //{
 
 //}
-bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono> dispImg, const Vector &tlPixel,
+bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono16> dispImg, const Vector &tlPixel,
                                       const Vector &brPixel, const int &step,
                                       Vector &point3D)
 {
@@ -32,7 +32,7 @@ bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono> dispImg, con
         point3D/=cnt;
 }
 
-bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono> dispImg, const Vector &pixel,
+bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono16> dispImg, const Vector &pixel,
                                   Vector &point3D)
 {
     if (pixel.size()==2)
@@ -41,16 +41,16 @@ bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono> dispImg, const V
         double imgH = double(dispImg.height());
         point3D.resize(3);
         int disp = dispImg.pixel(pixel[0],pixel[1]);
-        double d = double(disp);
-        point3D[0] = pixel[0]*baseLine/d;
-        point3D[1] = pixel[1]*baseLine/d;
+        double d = double(disp)*dispScale;
+        point3D[0] = (pixel[0]-imgW/2)*baseLine/d;
+        point3D[1] = (pixel[1]-imgH/2)*baseLine/d;
         point3D[2] = focalLength*imgW*baseLine/d;
 
 //        yInfo("focalLength: %f",focalLength);
 //        yInfo("baseline: %f",baseLine);
 //        yInfo("dispScale: %f",dispScale);
 //        yInfo("disparity at pixel [%s]: %d",pixel.toString(3,3).c_str(), disp);
-//        yInfo("img width, height: %f, %f",imgW, imgH);
+        yInfo("img width, height: %f, %f",imgW, imgH);
 //        yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
 //              point3D.toString(3,3).c_str());
 
@@ -60,10 +60,14 @@ bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono> dispImg, const V
         return false;
 }
 
-ImageOf<PixelMono> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int &_scale)
+/*
+//ImageOf<PixelMono> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int &_scale)
+template <class T>
+//ImageOf<T> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int &_scale)
+bool rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int &_scale, ImageOf<T> &yarpReturnImage)
 {
 
-    ImageOf<PixelMono> yarpReturnImage;
+//    ImageOf<T> yarpReturnImage;
     // prepare file name
 
     double t=buffer->getTimestampNS()/1000000000.0;
@@ -72,24 +76,54 @@ ImageOf<PixelMono> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int
 
     if (!buffer->getIsIncomplete() && buffer->getImagePresent())
     {
+        int scale = _scale;
         size_t width=buffer->getWidth();
         size_t height=buffer->getHeight();
         const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
-        cv::Mat image(height,width, CV_8U);
+        uint64_t format=buffer->getPixelFormat();
+        int imgType, imgDepth;
+        if (format == Coord3D_C16)
+            scale = 1;
+
+        switch (format)
+        {
+        case Mono8: // store 8 bit monochrome image
+        case Confidence8:
+        case Error8:
+        {
+            imgType = CV_8U;
+            imgDepth = 8;
+
+        }
+            break;
+
+        case Coord3D_C16: // store 16 bit monochrome image
+        {
+            scale = 1;
+            imgType = CV_16UC1;
+            imgDepth = 16;
+
+        }
+            break;
+        default:
+            break;
+        }
+
+//        cv::Mat image(height,width, CV_8U);
+//        cv::Mat image(width,height, CV_8U);
+        cv::Mat image(height,width,imgType);
         cv::Mat dst;
-        int scale = _scale;
 
         image.data = (unsigned char*) p;
 //        yInfo() <<"width "<< image.cols;
 //        yInfo() <<"height "<< image.rows;
-        uint64_t format=buffer->getPixelFormat();
-        if (format == Coord3D_C16)
-            scale = 1;
 
-        cv::resize(image, dst, cv::Size(int(height/scale),int(width/scale)));
+//        cv::resize(image, dst, cv::Size(int(height/scale),int(width/scale)));
+        cv::resize(image, dst, cvSize(int(width/scale),int(height/scale)));
 
         IplImage* image2;
-        image2 = cvCreateImage(cvSize(int(height/scale),int(width/scale)),8,1);
+//        image2 = cvCreateImage(cvSize(int(height/scale),int(width/scale)),8,1);
+        image2 = cvCreateImage(cvSize(int(width/scale),int(height/scale)),imgDepth,1);
         IplImage ipltemp=dst;
         cvCopy(&ipltemp,image2);
 
@@ -99,16 +133,126 @@ ImageOf<PixelMono> rcYarpWrapper::getBuffer(const rcg::Buffer *buffer, const int
     else if (!buffer->getImagePresent())
     {
         std::cerr << "getBuffer(): Received buffer without image" << std::endl;
-        return yarpReturnImage;
+//        return yarpReturnImage;
+        return false;
     }
     else if (buffer->getIsIncomplete())
     {
         std::cerr << "getBuffer(): Received buffer without image" << std::endl;
-        return yarpReturnImage;
+//        return yarpReturnImage;
+        return false;
     }
 
-    return yarpReturnImage;
+//    return yarpReturnImage;
+    return true;
 }
+
+*/
+
+bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono> &yarpReturnImage)
+//ImageOf<PixelMono> rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale)
+{
+
+//    ImageOf<PixelMono> yarpReturnImage;
+    // prepare file name
+
+    double t=buffer->getTimestampNS()/1000000000.0;
+
+    // store image (see e.g. the sv tool of cvkit for show images)
+
+    if (!buffer->getIsIncomplete() && buffer->getImagePresent())
+    {
+        int mScale = _scale;
+        size_t width=buffer->getWidth();
+        size_t height=buffer->getHeight();
+        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
+        int imgType, imgDepth;
+        imgType = CV_8U;
+        imgDepth = 8;
+
+        cv::Mat image(height,width,imgType);
+        cv::Mat dst;
+
+        image.data = (unsigned char*) p;
+
+        cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
+//        cv::resize(image, dst, cv::Size(int(height/mScale),int(width/mScale)));
+
+        IplImage* image2;
+        image2 = cvCreateImage(cv::Size(int(width/mScale),int(height/mScale)),imgDepth,1);
+//        image2 = cvCreateImage(cv::Size(int(height/mScale),int(width/mScale)),imgDepth,1);
+        IplImage ipltemp=dst;
+        cvCopy(&ipltemp,image2);
+
+        yarpReturnImage.wrapIplImage(image2);
+
+    }
+    else if (!buffer->getImagePresent())
+    {
+        yError() << "getBuffer(): Received buffer without image";
+        return false;
+//        return yarpReturnImage;
+    }
+    else if (buffer->getIsIncomplete())
+    {
+        yError() << "getBuffer(): Received buffer without image";
+        return false;
+//        return yarpReturnImage;
+    }
+    return true;
+//    return yarpReturnImage;
+}
+
+bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono16> &yarpReturnImage)
+//ImageOf<PixelMono16> rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale)
+{
+
+//    ImageOf<PixelMono16> yarpReturnImage;
+    // prepare file name
+
+    double t=buffer->getTimestampNS()/1000000000.0;
+
+    // store image (see e.g. the sv tool of cvkit for show images)
+
+    if (!buffer->getIsIncomplete() && buffer->getImagePresent())
+    {
+        int mScale = _scale;
+        size_t width=buffer->getWidth();
+        size_t height=buffer->getHeight();
+        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
+        int imgType, imgDepth;
+        imgType = CV_16U;
+        imgDepth = 16;
+
+        cv::Mat image(height,width,imgType);
+        cv::Mat dst;
+
+        image.data = (unsigned char*) p;
+
+        cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
+
+        IplImage* image2;
+        image2 = cvCreateImage(cvSize(int(width/mScale),int(height/mScale)),imgDepth,1);
+        IplImage ipltemp=dst;
+        cvCopy(&ipltemp,image2);
+
+        yarpReturnImage.wrapIplImage(image2);
+
+    }
+    else if (!buffer->getImagePresent())
+    {
+        yError() << "getBuffer(): Received buffer without image";
+        return false;
+    }
+    else if (buffer->getIsIncomplete())
+    {
+        yError() << "getBuffer(): Received buffer without image";
+        return false;
+    }
+//    return yarpReturnImage;
+    return true;
+}
+
 
 bool    rcYarpWrapper::configure(ResourceFinder &rf)
 {
@@ -211,7 +355,7 @@ bool    rcYarpWrapper::interruptModule()
 {
     yDebug("[%s] Interupt module",name.c_str());
 //    rpcPort.interrupt();
-    if (stream.size()>0)
+    if (dev && stream.size()>0)
     {
         stream[0]->stopStreaming();
         stream[0]->close();
@@ -229,7 +373,8 @@ bool    rcYarpWrapper::close()
     port_disp.close();
     port_mono.close();
     port_conf.close();
-    dev->close();
+    if (dev)
+        dev->close();
     rcg::System::clearSystems();
 
     return true;
@@ -249,66 +394,75 @@ bool    rcYarpWrapper::updateModule()
     {
         const rcg::Buffer *buffer=stream[0]->grab(30);
 
-        if (buffer != 0)
+        if (buffer !=0)
         {
-            ImageOf<PixelMono> img = getBuffer(buffer, scale);
-            if (img.getRowSize()>0)
-            {
+//            ImageOf<PixelMono> img = getBuffer(buffer, scale);
+//            if (img.getRowSize()>0)
+//            {
                 uint64_t format=buffer->getPixelFormat();
                 switch (format)
                 {
-                case Mono8: // store 8 bit monochrome image
-                case Confidence8:
-                case Error8:
-                {
-                    if (format == Mono8)
+                    case Mono8: // store 8 bit monochrome image
+                    case Confidence8:
+                    case Error8:
                     {
-                        //TODO: export image to monochrome port
-                        port_mono.prepare() = img;
-                        port_mono.write();
+                        ImageOf<PixelMono> img;
+                        if(getBuffer8(buffer, scale,img))
+                        {
+//                            ImageOf<PixelMono> img= getBuffer8(buffer, scale);
+                            if (format == Mono8)
+                            {
+                                //TODO: export image to monochrome port
+                                port_mono.prepare() = img;
+                                port_mono.write();
+                            }
+                            else if (format == Confidence8)
+                            {
+                                port_conf.prepare() = img;
+                                port_conf.write();
+                            }
+                            else if (format == Error8)
+                            {
+
+                            }
+                        }
                     }
-                    else if (format == Confidence8)
+                        break;
+
+                    case Coord3D_C16: // store 16 bit monochrome image
                     {
-                        port_conf.prepare() = img;
-                        port_conf.write();
-                    }
-                    else if (format == Error8)
-                    {
+                        ImageOf<PixelMono16> img;
+                        if (getBuffer16(buffer, 1, img))
+                        {
+    //                        ImageOf<PixelMono16> img= getBuffer16(buffer, 1);
+                            // copy image data, pgm is always big endian
+                            //TODO: export image to disparity port
+    //                        port_disp.prepare() = img;
+    //                        port_disp.write();
+                            Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);
+                            pixel[0] = 320; //col
+                            pixel[1] = 240; //row
+                            compute3DCoor(img,pixel, pt3D);
+
+                            p_tl = pixel-3;
+                            p_br = pixel+3;
+        //                    compute3DCoorRect(img,p_tl,p_br,2,pt3D);
+                            yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
+                                  pt3D.toString(3,3).c_str());
+                            if (buffer->isBigEndian())
+                            {
+
+                            }
+                            else
+                            {
+
+                            }
+                        }
 
                     }
-                }
                     break;
-
-                case Coord3D_C16: // store 16 bit monochrome image
-                {
-
-                    // copy image data, pgm is always big endian
-                    //TODO: export image to disparity port
-                    port_disp.prepare() = img;
-                    port_disp.write();
-                    Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);
-                    pixel[0] = 240; //row
-                    pixel[1] = 320; //col
-//                    compute3DCoor(img,pixel, pt3D);
-
-                    p_tl = pixel-3;
-                    p_br = pixel+3;
-                    compute3DCoorRect(img,p_tl,p_br,2,pt3D);
-                    yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
-                          pt3D.toString(3,3).c_str());
-                    if (buffer->isBigEndian())
-                    {
-
-                    }
-                    else
-                    {
-
-                    }
-
                 }
-                    break;
-                }
-            }
+//            }
 
         }
         else

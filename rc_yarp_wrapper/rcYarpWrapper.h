@@ -48,12 +48,22 @@ protected:
     double  getPeriod();
     bool    updateModule();
 public:
-    bool compute3DCoor(yarp::sig::ImageOf<yarp::sig::PixelMono> dispImg, const yarp::sig::Vector &pixel,
+    bool compute3DCoor(yarp::sig::ImageOf<yarp::sig::PixelMono16> dispImg, const yarp::sig::Vector &pixel,
                        yarp::sig::Vector &point3D);
-    bool compute3DCoorRect(yarp::sig::ImageOf<yarp::sig::PixelMono> dispImg, const yarp::sig::Vector &tlPixel,
+    bool compute3DCoorRect(yarp::sig::ImageOf<yarp::sig::PixelMono16> dispImg, const yarp::sig::Vector &tlPixel,
                            const yarp::sig::Vector &brPixel, const int &step,
                            yarp::sig::Vector &point3D);
-    yarp::sig::ImageOf<yarp::sig::PixelMono> getBuffer(const rcg::Buffer *buffer, const int &_scale);
+//    template <class T>
+////    yarp::sig::ImageOf<T> getBuffer(const rcg::Buffer *buffer, const int &_scale);
+//    bool getBuffer(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<T> &yarpReturnImage);
+
+//    yarp::sig::ImageOf<yarp::sig::PixelMono> getBuffer8(const rcg::Buffer *buffer, const int &_scale);
+//    yarp::sig::ImageOf<yarp::sig::PixelMono16> getBuffer16(const rcg::Buffer *buffer, const int &_scale);
+    bool getBuffer8(const rcg::Buffer *buffer, const int &_scale,
+                    yarp::sig::ImageOf<yarp::sig::PixelMono> &yarpReturnImage);
+    bool getBuffer16(const rcg::Buffer *buffer, const int &_scale,
+                     yarp::sig::ImageOf<yarp::sig::PixelMono16> &yarpReturnImage);
+
 //    rcYarpWrapper();
 };
 
