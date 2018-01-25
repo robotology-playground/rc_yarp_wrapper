@@ -29,7 +29,12 @@ bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono16> dispImg, c
         }
     }
     if (cnt>0)
+    {
         point3D/=cnt;
+        return true;
+    }
+    else
+        return false;
 }
 
 bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono16> dispImg, const Vector &pixel,
@@ -41,20 +46,28 @@ bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono16> dispImg, const
         double imgH = double(dispImg.height());
         point3D.resize(3);
         int disp = dispImg.pixel(pixel[0],pixel[1]);
-        double d = double(disp)*dispScale;
-        point3D[0] = (pixel[0]-imgW/2)*baseLine/d;
-        point3D[1] = (pixel[1]-imgH/2)*baseLine/d;
-        point3D[2] = focalLength*imgW*baseLine/d;
+        if (disp!=0)
+        {
+            double d = double(disp)*dispScale;
+            point3D[0] = (pixel[0]-imgW/2)*baseLine/d;
+            point3D[1] = (pixel[1]-imgH/2)*baseLine/d;
+            point3D[2] = focalLength*imgW*baseLine/d;
 
-//        yInfo("focalLength: %f",focalLength);
-//        yInfo("baseline: %f",baseLine);
-//        yInfo("dispScale: %f",dispScale);
-//        yInfo("disparity at pixel [%s]: %d",pixel.toString(3,3).c_str(), disp);
-        yInfo("img width, height: %f, %f",imgW, imgH);
-//        yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
-//              point3D.toString(3,3).c_str());
+    //        yInfo("focalLength: %f",focalLength);
+    //        yInfo("baseline: %f",baseLine);
+    //        yInfo("dispScale: %f",dispScale);
+    //        yInfo("disparity at pixel [%s]: %d",pixel.toString(3,3).c_str(), disp);
+//            yInfo("[%s] img width, height: %f, %f",name.c_str(),imgW, imgH);
+    //        yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
+    //              point3D.toString(3,3).c_str());
 
-        return true;
+            return true;
+        }
+        else
+        {
+            yDebug("[%s] disp==0",name.c_str());
+            return false;
+        }
     }
     else
         return false;
@@ -223,6 +236,13 @@ bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, ya
         cvCopy(&ipltemp,image2);
 
         yarpReturnImage.wrapIplImage(image2);
+        // TODO
+        if (buffer->isBigEndian())
+        {
+        }
+        else
+        {
+        }
 
     }
     else if (!buffer->getImagePresent())
@@ -427,21 +447,13 @@ bool    rcYarpWrapper::updateModule()
                             Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);
                             pixel[0] = 320; //col
                             pixel[1] = 240; //row
-                            compute3DCoor(img,pixel, pt3D);
+//                            compute3DCoor(img,pixel, pt3D);
 
                             p_tl = pixel-3;
                             p_br = pixel+3;
-        //                    compute3DCoorRect(img,p_tl,p_br,2,pt3D);
-                            yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
-                                  pt3D.toString(3,3).c_str());
-                            if (buffer->isBigEndian())
-                            {
-
-                            }
-                            else
-                            {
-
-                            }
+                            if (compute3DCoorRect(img,p_tl,p_br,2,pt3D))
+                                yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
+                                    pt3D.toString(3,3).c_str());
                         }
 
                     }
