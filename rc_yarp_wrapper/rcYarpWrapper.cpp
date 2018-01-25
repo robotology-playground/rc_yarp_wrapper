@@ -445,8 +445,8 @@ bool    rcYarpWrapper::updateModule()
     //                        port_disp.prepare() = img;
     //                        port_disp.write();
                             Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);
-                            pixel[0] = 320; //col
-                            pixel[1] = 240; //row
+                            pixel[0] = int(img.height()/2.0); //col
+                            pixel[1] = int(img.width()/2.0); //row
 //                            compute3DCoor(img,pixel, pt3D);
 
                             p_tl = pixel-3;
