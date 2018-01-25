@@ -33,15 +33,15 @@ include_directories(${YARP_INCLUDE_DIRS}
 source_group("Source Files" FILES ${source})
 source_group("Header Files" FILES ${header})
 
-#set(idl_files    skeleton3D.thrift)
+set(idl_files    rcYarpWrapper.thrift)
 
-#yarp_add_idl(IDL_GEN_FILES skeleton3D.thrift)
+yarp_add_idl(IDL_GEN_FILES rcYarpWrapper.thrift)
 
-#source_group("IDL Files" FILES ${idl_files})
+source_group("IDL Files" FILES ${idl_files})
 
 add_definitions(-D_USE_MATH_DEFINES)
 
-add_executable(rc_yarp_wrapper ${source} ${header} ${source_files} ${RC_GENICAM_API_DIR})# ${include_files})# ${IDL_GEN_FILES} ${idl_files}) #${lib_files})# ${source_files} ${include_files} )
+add_executable(rc_yarp_wrapper ${source} ${header} ${source_files} ${RC_GENICAM_API_DIR} ${include_files} ${IDL_GEN_FILES} ${idl_files}) #${lib_files})# ${source_files} ${include_files} )
 
 target_link_libraries(rc_yarp_wrapper ${YARP_LIBRARIES} ${OpenCV_LIBRARIES} ${RC_GENICAM_API_LIBRARIES} ${RC_GENICAM_API_DIR})
 

@@ -331,6 +331,9 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
         port_disp.open(("/"+name+"/disp").c_str());
         port_conf.open(("/"+name+"/confidence").c_str());
 
+        rpcPort.open("/"+name+"/rpc");
+        attach(rpcPort);
+
         // open stream and get images
         stream=dev->getStreams();
 
@@ -385,6 +388,12 @@ bool    rcYarpWrapper::close()
     return true;
 }
 
+bool    rcYarpWrapper::attach(RpcServer &source)
+{
+    return this->yarp().attachAsServer(source);
+//    return true;
+}
+
 double  rcYarpWrapper::getPeriod()
 {
     return period;
@@ -436,8 +445,8 @@ bool    rcYarpWrapper::updateModule()
 
                     case Coord3D_C16: // store 16 bit monochrome image
                     {
-                        ImageOf<PixelMono16> img;
-                        if (getBuffer16(buffer, 1, img))
+//                        ImageOf<PixelMono16> img;
+                        if (getBuffer16(buffer, 1, imgDisp))
                         {
     //                        ImageOf<PixelMono16> img= getBuffer16(buffer, 1);
                             // copy image data, pgm is always big endian
@@ -445,13 +454,13 @@ bool    rcYarpWrapper::updateModule()
     //                        port_disp.prepare() = img;
     //                        port_disp.write();
                             Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);
-                            pixel[0] = int(img.height()/2.0); //col
-                            pixel[1] = int(img.width()/2.0); //row
+                            pixel[0] = int(imgDisp.height()/2.0); //col
+                            pixel[1] = int(imgDisp.width()/2.0); //row
 //                            compute3DCoor(img,pixel, pt3D);
 
                             p_tl = pixel-3;
                             p_br = pixel+3;
-                            if (compute3DCoorRect(img,p_tl,p_br,2,pt3D))
+                            if (compute3DCoorRect(imgDisp,p_tl,p_br,2,pt3D))
                                 yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
                                     pt3D.toString(3,3).c_str());
                         }

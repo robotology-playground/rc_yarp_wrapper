@@ -27,15 +27,20 @@
 #include <iomanip>
 #include <algorithm>
 
-class rcYarpWrapper : public yarp::os::RFModule
+#include "rcYarpWrapper_IDL.h"
+
+class rcYarpWrapper : public yarp::os::RFModule, public rcYarpWrapper_IDL
 {
 protected:
-    double          period;
-    std::string     name;       //!< module name
-    int             scale;      //!< scale factor to resize original image
+    double                      period;
+    std::string                 name;                               //!< module name
+    int                         scale;                              //!< scale factor to resize original image
+    yarp::os::RpcServer         rpcPort;                            //!< rpc server to receive user request
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono> > port_mono, port_disp, port_conf;
     std::shared_ptr<rcg::Device>                dev;
     std::vector<std::shared_ptr<rcg::Stream> >  stream;
+
+    yarp::sig::ImageOf<yarp::sig::PixelMono16> imgDisp;
 
     double          focalLength;//!< camera focalLength
     double          baseLine;   //!< camera baseline
@@ -44,7 +49,7 @@ protected:
     bool    configure(yarp::os::ResourceFinder &rf);
     bool    interruptModule();
     bool    close();
-//    bool    attach(RpcServer &source);
+    bool    attach(yarp::os::RpcServer &source);
     double  getPeriod();
     bool    updateModule();
 public:
@@ -61,8 +66,29 @@ public:
                     yarp::sig::ImageOf<yarp::sig::PixelMono> &yarpReturnImage);
     bool getBuffer16(const rcg::Buffer *buffer, const int &_scale,
                      yarp::sig::ImageOf<yarp::sig::PixelMono16> &yarpReturnImage);
+    /************************************************************************/
+    // Thrift methods
+    Point3D Rect(const int16_t tlx, const int16_t tly, const int16_t w, const int16_t h, const int16_t step)
+    {
+        yarp::sig::Vector tl(2,0.0), br(2,0.0), pt3D(3,0.0);
+        tl[0] = tlx;
+        tl[1] = tly;
+        br[0] = tlx+w;
+        br[1] = tly+h;
+//        Point3D _pt3D();
+        if (imgDisp.width()>0 && imgDisp.height()>0)
+            if (compute3DCoorRect(imgDisp,tl,br,step,pt3D))
+            {
+//                _pt3D(). = pt3D[0];
+//                _pt3D().y = pt3D[1];
+//                _pt3D().z = pt3D[2];
+                return Point3D(pt3D[0],pt3D[1],pt3D[2]);
+            }
+        else
+            return Point3D();
 
-//    rcYarpWrapper();
+    }
+
 };
 
 #endif // RCYARPWRAPPER_H
