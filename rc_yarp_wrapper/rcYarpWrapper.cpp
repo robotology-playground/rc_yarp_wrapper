@@ -31,6 +31,7 @@ bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono16> dispImg, c
     if (cnt>0)
     {
         point3D/=cnt;
+        yInfo("point3D: %s", point3D.toString(3,3).c_str());
         return true;
     }
     else

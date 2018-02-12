@@ -75,20 +75,26 @@ public:
     // Thrift methods
     Point3D Rect(const int16_t tlx, const int16_t tly, const int16_t w, const int16_t h, const int16_t step)
     {
-        yarp::sig::Vector tl(2,0.0), br(2,0.0), pt3D(3,0.0);
-        tl[0] = tlx;
-        tl[1] = tly;
-        br[0] = tlx+w;
-        br[1] = tly+h;
-//        Point3D _pt3D();
-        if (imgDisp.width()>0 && imgDisp.height()>0)
-            if (compute3DCoorRect(imgDisp,tl,br,step,pt3D))
-            {
-//                _pt3D(). = pt3D[0];
-//                _pt3D().y = pt3D[1];
-//                _pt3D().z = pt3D[2];
-                return Point3D(pt3D[0],pt3D[1],pt3D[2]);
-            }
+        yInfo("received: Rect %d %d %d %d %d", tlx, tly, w, h, step);
+        if (tlx>=0 && tly>=0 && w>=0 && h>=0)
+        {
+            yarp::sig::Vector tl(2,0.0), br(2,0.0), pt3D(3,0.0);
+            tl[0] = tlx;
+            tl[1] = tly;
+            br[0] = tlx+w;
+            br[1] = tly+h;
+    //        Point3D _pt3D();
+            if (imgDisp.width()>0 && imgDisp.height()>0)
+                if (compute3DCoorRect(imgDisp,tl,br,step,pt3D))
+                {
+    //                _pt3D(). = pt3D[0];
+    //                _pt3D().y = pt3D[1];
+    //                _pt3D().z = pt3D[2];
+                    return Point3D(pt3D[0],pt3D[1],pt3D[2]);
+                }
+            else
+                return Point3D();
+        }
         else
             return Point3D();
 

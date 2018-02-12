@@ -2,17 +2,30 @@
 <name>rcCamera with Skeleton3D </name>
 
     <!--OPC and related modules-->
+
+    <module>
+        <name>iCubGui</name>
+        <parameters>--xpos 1300 --ypos 0 --width 600 --height 930</parameters>
+        <node>localhost</node>
+        <tag>iCubGui</tag>
+    </module>
     <module>
        <name>objectsPropertiesCollector</name>
        <parameters>--name OPC --no-load-db --no-save-db</parameters>
-       <node>icub21</node>
+       <node>localhost</node>
     </module>
 
      <!--SFM modules-->
     <module>
+        <name>rc_yarp_wrapper</name>
+        <parameters>--device enp0s31f6:00_14_2d_2c_6e_56 --error 1 --confidence 1</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
         <name>skeleton2D.py</name>
         <parameters>--des /skeleton2D</parameters>
-        <node>icub-cuda</node>
+        <node>localhost</node>
     </module>
 
     <module>
@@ -47,13 +60,13 @@
     </module>
     <module>
         <name>skeleton3D</name>
-        <parameters>--dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 9 --use_part_conf 0 --period 0.01 --body_valence 0.0</parameters>
+        <parameters>--depth_rpc /rc_img_conveyor/rpc --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 9 --use_part_conf 0 --period 0.01 --body_valence 0.0</parameters>
         <dependencies>
             <port timeout="10">/OPC/rpc</port>
-            <port timeout="10">/SFM/rpc</port>
+            <port timeout="10">/rc_img_conveyor/rpc</port>
             <port timeout="10">/skeleton2D/bodyParts:o</port>
         </dependencies>
-        <node>icub21</node>
+        <node>localhost</node>
     </module>
     <!--PPS modules-->
 
@@ -65,7 +78,7 @@
         <dependencies>
             <port timeout="10">/OPC/rpc</port>
         </dependencies>
-        <node>icub21</node>
+        <node>localhost</node>
     </module>
 
 
