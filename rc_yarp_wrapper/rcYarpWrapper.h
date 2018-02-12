@@ -37,6 +37,7 @@ protected:
     int                         scale;                              //!< scale factor to resize original image
     yarp::os::RpcServer         rpcPort;                            //!< rpc server to receive user request
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono> > port_mono, port_disp, port_conf;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb> > port_color;
     std::shared_ptr<rcg::Device>                dev;
     std::vector<std::shared_ptr<rcg::Stream> >  stream;
 
@@ -64,6 +65,10 @@ public:
 
     bool getBuffer8(const rcg::Buffer *buffer, const int &_scale,
                     yarp::sig::ImageOf<yarp::sig::PixelMono> &yarpReturnImage);
+
+    bool getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &_scale,
+                               yarp::sig::ImageOf<yarp::sig::PixelRgb> &yarpReturnImage);
+
     bool getBuffer16(const rcg::Buffer *buffer, const int &_scale,
                      yarp::sig::ImageOf<yarp::sig::PixelMono16> &yarpReturnImage);
     /************************************************************************/

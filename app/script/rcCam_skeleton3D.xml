@@ -29,6 +29,12 @@
 
     <module>
         <name>yarpview</name>
+        <parameters>--name /color --x 320 --y 720 --p 50 --autosize</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
         <parameters>--name /confidence --x 960 --y 720 --p 50</parameters>
         <node>localhost</node>
     </module>
@@ -37,7 +43,7 @@
     <module>
         <name>yarpview</name>
         <parameters>--name /dispSkeleton:i --x 960 --y 370 --p 50</parameters>
-        <node>icub22</node>
+        <node>localhost</node>
     </module>
     <module>
         <name>skeleton3D</name>
@@ -88,6 +94,12 @@
     <connection>
         <from>/rc_img_conveyor/mono</from>
         <to>/mono</to>
+        <protocol>udp</protocol>
+    </connection>
+
+    <connection>
+        <from>/rc_img_conveyor/color</from>
+        <to>/color</to>
         <protocol>udp</protocol>
     </connection>
 

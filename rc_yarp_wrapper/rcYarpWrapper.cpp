@@ -208,6 +208,56 @@ bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yar
     return true;
 }
 
+bool rcYarpWrapper::getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelRgb> &yarpReturnImage)
+{
+    // prepare file name
+
+    double t=buffer->getTimestampNS()/1000000000.0;
+
+    if (!buffer->getIsIncomplete() && buffer->getImagePresent())
+    {
+        int mScale = _scale;
+        size_t width=buffer->getWidth();
+        size_t height=buffer->getHeight();
+        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
+        int imgType, imgDepth;
+        imgType = CV_8U;
+        imgDepth = 8;
+
+        cv::Mat image(height,width,imgType);
+        cv::Mat dst;
+
+        image.data = (unsigned char*) p;
+
+        cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
+
+        // Convert to fake color
+        cv::Mat color_image;
+        cv::cvtColor(dst,color_image,CV_GRAY2RGB);
+
+        // Mat to IplImage
+        IplImage* image2;
+        image2 = cvCreateImage(cv::Size(int(width/mScale),int(height/mScale)),imgDepth,3);
+        IplImage ipltemp=color_image;
+        cvCopy(&ipltemp,image2);
+
+
+        yarpReturnImage.wrapIplImage(image2);
+
+    }
+    else if (!buffer->getImagePresent())
+    {
+        yError() << "getBuffer(): Received buffer without image";
+        return false;
+    }
+    else if (buffer->getIsIncomplete())
+    {
+        yError() << "getBuffer(): Received buffer without image";
+        return false;
+    }
+    return true;
+}
+
 bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono16> &yarpReturnImage)
 {
     // prepare file name
@@ -331,6 +381,8 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
         port_disp.open(("/"+name+"/disp").c_str());
         port_conf.open(("/"+name+"/confidence").c_str());
 
+        port_color.open(("/"+name+"/color").c_str());
+
         rpcPort.open("/"+name+"/rpc");
         attach(rpcPort);
 
@@ -416,7 +468,15 @@ bool    rcYarpWrapper::updateModule()
                 uint64_t format=buffer->getPixelFormat();
                 switch (format)
                 {
-                    case Mono8: // store 8 bit monochrome image
+                    case Mono8:
+                    {
+                        ImageOf<PixelRgb> img;
+                        if (getBuffer8andCvtColor(buffer, scale, img))
+                        {
+                            port_color.prepare() = img;
+                            port_color.write();
+                        }
+                    }
                     case Confidence8:
                     case Error8:
                     {
