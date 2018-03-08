@@ -46,6 +46,7 @@ protected:
     double          focalLength;//!< camera focalLength
     double          baseLine;   //!< camera baseline
     double          dispScale;  //!< disparity scale factor
+    yarp::sig::Matrix           T_CamInRobot;
 
     bool    configure(yarp::os::ResourceFinder &rf);
     bool    interruptModule();

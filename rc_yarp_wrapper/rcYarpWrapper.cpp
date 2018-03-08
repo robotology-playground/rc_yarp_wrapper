@@ -32,6 +32,11 @@ bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono16> dispImg, c
     {
         point3D/=cnt;
         yInfo("point3D: %s", point3D.toString(3,3).c_str());
+        Vector point3D_temp(4,1.0);
+        point3D_temp.setSubvector(0,point3D);
+        point3D_temp = SE3inv(T_CamInRobot) * point3D_temp;
+        point3D = point3D_temp.subVector(0,2);
+        yInfo("point3D in robot frame: %s", point3D.toString(3,3).c_str());
         return true;
     }
     else
@@ -47,6 +52,24 @@ bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono16> dispImg, const
         double imgH = double(dispImg.height());
         point3D.resize(3);
         int disp = dispImg.pixel(pixel[0],pixel[1]);
+
+//        Matrix T(4,4);
+////        // pose x-axis  y-axis       z-axis
+////        T(0,0)=-1.0;    T(0,1)= 0.0; T(0,2)= 0.0;   T(0,3)=-0.6008;     // x-coordinate
+////        T(1,0)= 0.0;    T(1,1)=-1.0; T(1,2)= 0.0;   T(1,3)=-1.0761;     // y-coordinate
+////        T(2,0)= 0.0;    T(2,1)= 0.0; T(2,2)= 1.0;   T(2,3)= 0.2629;     // z-coordinate
+//        Vector rpy(3,0.0);
+//        rpy[0] = -98.21*M_PI/180.0;
+//        rpy[1] =   2.89*M_PI/180.0;
+//        rpy[2] = -56.32*M_PI/180.0;
+
+//        T = rpy2dcm(rpy);
+//        T(0,3)=-0.6008;
+//        T(1,3)=-1.0761;
+//        T(2,3)= 0.2629;
+
+//        yDebug("T = %s", T.toString(3,3).c_str());
+
         if (disp!=0)
         {
             double d = double(disp)*dispScale;
@@ -320,6 +343,39 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
         yError("Device %s not found",device.c_str());
         return false;
     }
+
+    Vector xyzrpy(6,0.0);
+    // Calibrators
+    if (rf.check("cam_in_robot"))
+    {
+        Bottle *camInRobotTransform = rf.find("cam_in_robot").asList();
+        if ((!camInRobotTransform->isNull()) && (camInRobotTransform->size()==6))
+        {
+            for (int i=0; i<6; i++)
+                xyzrpy[i] = camInRobotTransform->get(i).asDouble();
+        }
+        else
+            yWarning("[%s] Found %s  in the config file but it is empty; using default", name.c_str(), "calibrator");
+
+    }
+    else
+    {
+         yWarning("[%s] Could not find %s  in the config file; using default", name.c_str(), "calibrator");
+    }
+
+//    Matrix T(4,4);
+//    Vector rpy(3,0.0);
+//    rpy[0] = -98.21*M_PI/180.0;
+//    rpy[1] =   2.89*M_PI/180.0;
+//    rpy[2] = -56.32*M_PI/180.0;
+//    T(0,3)=-0.6008;
+//    T(1,3)=-1.0761;
+//    T(2,3)= 0.2629;
+    Vector rpy = xyzrpy.subVector(3,5)*M_PI/180.0;
+    T_CamInRobot = rpy2dcm(rpy);
+    T_CamInRobot.setSubcol(xyzrpy.subVector(0,2),0,3);
+
+    yDebug("T_CamInRobot = %s", T_CamInRobot.toString(3,3).c_str());
 
     return true;
 }
