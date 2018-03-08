@@ -31,6 +31,11 @@ bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono16> dispImg, c
     if (cnt>0)
     {
         point3D/=cnt;
+        //test conversion to iCub frame
+        Vector temp = point3D;
+        point3D[0] =  1.0*temp[2];
+        point3D[1] =  1.0*temp[0];
+        point3D[2] = -1.0*temp[1];
         yInfo("point3D: %s", point3D.toString(3,3).c_str());
         Vector point3D_temp(4,1.0);
         point3D_temp.setSubvector(0,point3D);
@@ -75,7 +80,7 @@ bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono16> dispImg, const
             double d = double(disp)*dispScale;
             point3D[0] = (pixel[0]-imgW/2)*baseLine/d;
             point3D[1] = (pixel[1]-imgH/2)*baseLine/d;
-            point3D[2] = focalLength*imgW*baseLine/d;
+            point3D[2] = focalLength*imgW*baseLine/d;           
 
     //        yInfo("focalLength: %f",focalLength);
     //        yInfo("baseline: %f",baseLine);
