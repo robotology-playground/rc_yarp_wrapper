@@ -36,17 +36,19 @@ protected:
     std::string                 name;                               //!< module name
     int                         scale;                              //!< scale factor to resize original image
     yarp::os::RpcServer         rpcPort;                            //!< rpc server to receive user request
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono> > port_mono, port_disp, port_conf;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono> > port_mono, port_conf;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono16> > port_disp;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb> > port_color;
     std::shared_ptr<rcg::Device>                dev;
     std::vector<std::shared_ptr<rcg::Stream> >  stream;
 
-    yarp::sig::ImageOf<yarp::sig::PixelMono16> imgDisp;
+    yarp::sig::ImageOf<yarp::sig::PixelMono16>  imgDisp;
+    yarp::sig::ImageOf<yarp::sig::PixelRgb>     imgColor;
 
     double          focalLength;//!< camera focalLength
     double          baseLine;   //!< camera baseline
     double          dispScale;  //!< disparity scale factor
-    yarp::sig::Matrix           T_CamInRobot;
+    yarp::sig::Matrix           T_CamInRobot;   //!< transformation matrix from robot to camera frame (left)
 
     bool    configure(yarp::os::ResourceFinder &rf);
     bool    interruptModule();
@@ -76,7 +78,13 @@ public:
     // Thrift methods
     Point3D Rect(const int16_t tlx, const int16_t tly, const int16_t w, const int16_t h, const int16_t step)
     {
-        yInfo("received: Rect %d %d %d %d %d", tlx, tly, w, h, step);
+        yInfo("[%s] received : Rect %d %d %d %d %d", name.c_str(), tlx, tly, w, h, step);
+
+        // Convert received pixel coordinate (in color image) to coordinate in disparity image
+//        int16_t tlx_temp = int16_t(tlx*imgDisp.width()/imgColor.width());
+//        int16_t tly_temp = int16_t(tly*imgDisp.height()/imgColor.height());
+
+//        yInfo("[%s] converted: Rect %d %d %d %d %d", name.c_str(), tlx_temp, tly_temp, w, h, step);
         if (tlx>=0 && tly>=0 && w>=0 && h>=0)
         {
             yarp::sig::Vector tl(2,0.0), br(2,0.0), pt3D(3,0.0);
@@ -91,6 +99,8 @@ public:
     //                _pt3D(). = pt3D[0];
     //                _pt3D().y = pt3D[1];
     //                _pt3D().z = pt3D[2];
+                    yInfo("3D coordinator of [%s] pixel of disp image: %s",tl.toString(3,3).c_str(),
+                        pt3D.toString(3,3).c_str());
                     return Point3D(pt3D[0],pt3D[1],pt3D[2]);
                 }
             else

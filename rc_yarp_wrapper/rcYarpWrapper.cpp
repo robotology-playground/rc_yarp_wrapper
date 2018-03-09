@@ -31,15 +31,10 @@ bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono16> dispImg, c
     if (cnt>0)
     {
         point3D/=cnt;
-        //test conversion to iCub frame
-        Vector temp = point3D;
-        point3D[0] =  1.0*temp[2];
-        point3D[1] =  1.0*temp[0];
-        point3D[2] = -1.0*temp[1];
-        yInfo("point3D: %s", point3D.toString(3,3).c_str());
+        yInfo("point3D in cam frame  : %s", point3D.toString(3,3).c_str());
         Vector point3D_temp(4,1.0);
         point3D_temp.setSubvector(0,point3D);
-        point3D_temp = SE3inv(T_CamInRobot) * point3D_temp;
+        point3D_temp = T_CamInRobot * point3D_temp;
         point3D = point3D_temp.subVector(0,2);
         yInfo("point3D in robot frame: %s", point3D.toString(3,3).c_str());
         return true;
@@ -56,24 +51,10 @@ bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono16> dispImg, const
         double imgW = double(dispImg.width());
         double imgH = double(dispImg.height());
         point3D.resize(3);
-        int disp = dispImg.pixel(pixel[0],pixel[1]);
-
-//        Matrix T(4,4);
-////        // pose x-axis  y-axis       z-axis
-////        T(0,0)=-1.0;    T(0,1)= 0.0; T(0,2)= 0.0;   T(0,3)=-0.6008;     // x-coordinate
-////        T(1,0)= 0.0;    T(1,1)=-1.0; T(1,2)= 0.0;   T(1,3)=-1.0761;     // y-coordinate
-////        T(2,0)= 0.0;    T(2,1)= 0.0; T(2,2)= 1.0;   T(2,3)= 0.2629;     // z-coordinate
-//        Vector rpy(3,0.0);
-//        rpy[0] = -98.21*M_PI/180.0;
-//        rpy[1] =   2.89*M_PI/180.0;
-//        rpy[2] = -56.32*M_PI/180.0;
-
-//        T = rpy2dcm(rpy);
-//        T(0,3)=-0.6008;
-//        T(1,3)=-1.0761;
-//        T(2,3)= 0.2629;
-
-//        yDebug("T = %s", T.toString(3,3).c_str());
+        // TODO if(dispImg.isPixel(pixel[0], pixel[1])
+        int disp=0;
+        if(dispImg.isPixel(pixel[0], pixel[1]))
+            disp = int(dispImg.pixel(pixel[0],pixel[1]));
 
         if (disp!=0)
         {
@@ -82,19 +63,16 @@ bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono16> dispImg, const
             point3D[1] = (pixel[1]-imgH/2)*baseLine/d;
             point3D[2] = focalLength*imgW*baseLine/d;           
 
-    //        yInfo("focalLength: %f",focalLength);
-    //        yInfo("baseline: %f",baseLine);
-    //        yInfo("dispScale: %f",dispScale);
-    //        yInfo("disparity at pixel [%s]: %d",pixel.toString(3,3).c_str(), disp);
+//            yInfo("disparity at pixel [%s]: %d",pixel.toString(3,3).c_str(), disp);
 //            yInfo("[%s] img width, height: %f, %f",name.c_str(),imgW, imgH);
-    //        yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
-    //              point3D.toString(3,3).c_str());
+//            yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
+//                  point3D.toString(3,3).c_str());
 
             return true;
         }
         else
         {
-            yDebug("[%s] disp==0",name.c_str());
+//            yWarning("[%s] disp==0, invalid disparity at the pixel [%f, %f]",name.c_str(), pixel[0], pixel[1]);
             return false;
         }
     }
@@ -318,6 +296,10 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
         baseLine=rcg::getFloat(nodemap, "Baseline", 0, 0, true);
         dispScale=rcg::getFloat(nodemap, "Scan3dCoordinateScale", 0, 0, true);
 
+        yInfo("focalLength: %f",focalLength);
+        yInfo("baseline: %f",baseLine);
+        yInfo("dispScale: %f",dispScale);
+
         port_mono.open(("/"+name+"/mono").c_str());
         port_disp.open(("/"+name+"/disp").c_str());
         port_conf.open(("/"+name+"/confidence").c_str());
@@ -436,18 +418,16 @@ bool    rcYarpWrapper::updateModule()
 
         if (buffer !=0)
         {
-//            ImageOf<PixelMono> img = getBuffer(buffer, scale);
-//            if (img.getRowSize()>0)
-//            {
+
                 uint64_t format=buffer->getPixelFormat();
                 switch (format)
                 {
                     case Mono8:
                     {
-                        ImageOf<PixelRgb> img;
-                        if (getBuffer8andCvtColor(buffer, scale, img))
+//                        ImageOf<PixelRgb> img;
+                        if (getBuffer8andCvtColor(buffer, scale, imgColor)) // color image has size of 240x320
                         {
-                            port_color.prepare() = img;
+                            port_color.prepare() = imgColor;
                             port_color.write();
                         }
                     }
@@ -455,16 +435,16 @@ bool    rcYarpWrapper::updateModule()
                     case Error8:
                     {
                         ImageOf<PixelMono> img;
-                        if(getBuffer8(buffer, scale,img))
+                        if(getBuffer8(buffer, scale,img))   // mono image has size of 240x320
                         {
 //                            ImageOf<PixelMono> img= getBuffer8(buffer, scale);
-                            if (format == Mono8)
-                            {
-                                //TODO: export image to monochrome port
-                                port_mono.prepare() = img;
-                                port_mono.write();
-                            }
-                            else if (format == Confidence8)
+//                            if (format == Mono8)
+//                            {
+//                                //TODO: export image to monochrome port
+//                                port_mono.prepare() = img;
+//                                port_mono.write();
+//                            }
+                            if (format == Confidence8)
                             {
                                 port_conf.prepare() = img;
                                 port_conf.write();
@@ -480,22 +460,23 @@ bool    rcYarpWrapper::updateModule()
                     case Coord3D_C16: // store 16 bit monochrome image
                     {
 //                        ImageOf<PixelMono16> img;
-                        if (getBuffer16(buffer, 1, imgDisp))
+                        if (getBuffer16(buffer, 1, imgDisp))        // Disparity map has size of 480x640
                         {
     //                        ImageOf<PixelMono16> img= getBuffer16(buffer, 1);
                             // copy image data, pgm is always big endian
                             //TODO: export image to disparity port
-    //                        port_disp.prepare() = img;
-    //                        port_disp.write();
+                            port_disp.prepare() = imgDisp;
+                            port_disp.write();
                             Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);
-                            pixel[0] = int(imgDisp.height()/2.0); //col
-                            pixel[1] = int(imgDisp.width()/2.0); //row
-//                            compute3DCoor(img,pixel, pt3D);
+                            pixel[0] = int(imgDisp.width()/2.0); //col
+                            pixel[1] = int(imgDisp.height()/2.0); //row
+//                            pixel[1] = 200;
+//                            compute3DCoor(imgDisp,pixel, pt3D);
 
-                            p_tl = pixel-3;
-                            p_br = pixel+3;
-                            if (compute3DCoorRect(imgDisp,p_tl,p_br,2,pt3D))
-                                yInfo("3D coordinator of pixel [%s]: %s",pixel.toString(3,3).c_str(),
+                            p_tl = pixel-1;
+                            p_br = pixel+1;
+                            if (compute3DCoorRect(imgDisp,p_tl,p_br,1,pt3D))
+                                yInfo("3D coordinator of [%s] pixel of disp image: %s",pixel.toString(3,3).c_str(),
                                     pt3D.toString(3,3).c_str());
                         }
 
@@ -507,7 +488,7 @@ bool    rcYarpWrapper::updateModule()
         }
         else
         {
-            yError() << "Cannot grab images";
+//            yError() << "Cannot grab images"; //Deactivate for now
             break;
         }
 
