@@ -14,6 +14,8 @@
 #include <cv.h>
 #include <cvaux.h>
 #include <highgui.h>
+#include "opencv2/opencv.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 #include <yarp/os/all.h>
 //#include <yarp/dev/all.h>
@@ -57,9 +59,9 @@ protected:
     double  getPeriod();
     bool    updateModule();
 public:
-    bool compute3DCoor(yarp::sig::ImageOf<yarp::sig::PixelMono16> dispImg, const yarp::sig::Vector &pixel,
+    bool compute3DCoor(const yarp::sig::ImageOf<yarp::sig::PixelMono16> &dispImg, const yarp::sig::Vector &pixel,
                        yarp::sig::Vector &point3D);
-    bool compute3DCoorRect(yarp::sig::ImageOf<yarp::sig::PixelMono16> dispImg, const yarp::sig::Vector &tlPixel,
+    bool compute3DCoorRect(const yarp::sig::ImageOf<yarp::sig::PixelMono16> &dispImg, const yarp::sig::Vector &tlPixel,
                            const yarp::sig::Vector &brPixel, const int &step,
                            yarp::sig::Vector &point3D);
 //    template <class T>
