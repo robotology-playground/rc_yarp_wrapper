@@ -9,7 +9,7 @@ using namespace yarp::math;
 //{
 
 //}
-bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono16> dispImg, const Vector &tlPixel,
+bool rcYarpWrapper::compute3DCoorRect(const yarp::sig::ImageOf<PixelMono16> &dispImg, const Vector &tlPixel,
                                       const Vector &brPixel, const int &step,
                                       Vector &point3D)
 {
@@ -43,7 +43,7 @@ bool rcYarpWrapper::compute3DCoorRect(yarp::sig::ImageOf<PixelMono16> dispImg, c
         return false;
 }
 
-bool rcYarpWrapper::compute3DCoor(yarp::sig::ImageOf<PixelMono16> dispImg, const Vector &pixel,
+bool rcYarpWrapper::compute3DCoor(const yarp::sig::ImageOf<PixelMono16> &dispImg, const Vector &pixel,
                                   Vector &point3D)
 {
     if (pixel.size()==2)

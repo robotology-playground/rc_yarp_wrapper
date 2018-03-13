@@ -46,6 +46,8 @@
 #include <cv.h>
 #include <cvaux.h>
 #include <highgui.h>
+#include "opencv2/opencv.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 #include <yarp/os/all.h>
 //#include <yarp/dev/all.h>
