@@ -36,7 +36,7 @@
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /disp --x 640 --y 720 --p 50</parameters>
+        <parameters>--name /disp --x 960 --y 370 --p 50</parameters>
         <node>localhost</node>
     </module>
 
@@ -55,7 +55,7 @@
     <!--Skeleton modules-->
     <module>
         <name>yarpview</name>
-        <parameters>--name /dispSkeleton:i --x 960 --y 370 --p 50</parameters>
+        <parameters>--name /dispSkeleton:i --x 640 --y 720 --p 50</parameters>
         <node>localhost</node>
     </module>
     <module>
