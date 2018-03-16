@@ -1,0 +1,104 @@
+
+<application>
+
+    <name>On The Fly KIA</name>
+
+    <dependencies>
+
+    </dependencies>
+
+    <!-- Modules -->
+
+          
+    <module>
+        <name>managerOnTheFly</name>               
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>caffeCoder</name>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>linearClassifierModule</name>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /onTheFlyRecognition/view --x 1300</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /onTheFlyRecognition/confidence --x 900</parameters>
+        <node>localhost</node>
+    </module>
+
+    <!-- Connections -->
+
+    <connection>
+        <from>/rc_img_conveyor/color</from>
+        <to>/onTheFlyRecognition/img:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+
+    <!-- Coding -->
+
+    <connection>
+        <from>/skeleton3D/handBlobs:o</from>
+        <to>/onTheFlyRecognition/blobs:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+
+
+    <connection>
+        <from>/onTheFlyRecognition/crop:o</from>
+        <to>/caffeCoder/img:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/caffeCoder/code:o</from>
+        <to>/linearClassifier/features:i</to>
+        <protocol>tcp</protocol>
+    </connection> 
+
+    <connection>
+        <from>/linearClassifier/scores:o</from>
+        <to>/onTheFlyRecognition/scores:i</to>
+        <protocol>tcp</protocol>
+    </connection> 
+
+    <!-- Manager -->
+
+    <connection>
+        <from>/onTheFlyRecognition/classifier:io</from>
+        <to>/linearClassifier/rpc</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+
+    <!-- Visualization -->
+
+    <connection>
+        <from>/onTheFlyRecognition/show:o</from>
+        <to>/onTheFlyRecognition/view</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+    
+    <connection>
+        <from>/onTheFlyRecognition/confidence:o</from>
+        <to>/onTheFlyRecognition/confidence</to>
+        <protocol>mcast</protocol>
+    </connection>
+
+   
+</application>
+
+
+

@@ -18,37 +18,25 @@
      <!--SFM modules-->
     <module>
         <name>rc_yarp_wrapper</name>
-        <parameters>--device enp0s31f6:00_14_2d_2c_6e_56 --error 1 --confidence 1</parameters>
+        <parameters>--device enp0s31f6:00_14_2d_2c_70_01 --error 1 --confidence 1</parameters>
         <node>localhost</node>
     </module>
 
     <module>
         <name>skeleton2D.py</name>
-        <parameters>--des /skeleton2D</parameters>
+        <parameters>--des /skeleton2D --src /rc_img_conveyor/color</parameters>
         <node>localhost</node>
     </module>
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /mono --x 320 --y 720 --p 50 --autosize</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpview</name>
-        <parameters>--name /disp --x 960 --y 370 --p 50</parameters>
+        <parameters>--name /disp  --x 960 --y 720 --p 50</parameters>
         <node>localhost</node>
     </module>
 
     <module>
         <name>yarpview</name>
         <parameters>--name /color --x 320 --y 720 --p 50 --autosize</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpview</name>
-        <parameters>--name /confidence --x 960 --y 720 --p 50</parameters>
         <node>localhost</node>
     </module>
 
@@ -60,7 +48,7 @@
     </module>
     <module>
         <name>skeleton3D</name>
-        <parameters>--depth_rpc /rc_img_conveyor/rpc --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 9 --use_part_conf 0 --period 0.01 --body_valence 0.0</parameters>
+        <parameters>--depth_rpc /rc_img_conveyor/rpc --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 9 --use_part_conf 0 --period 0.01 --body_valence 0.0 --draw_lower 1</parameters>
         <dependencies>
             <port timeout="10">/OPC/rpc</port>
             <port timeout="10">/rc_img_conveyor/rpc</port>
@@ -68,8 +56,6 @@
         </dependencies>
         <node>localhost</node>
     </module>
-    <!--PPS modules-->
-
 
     <!--GUI modules-->
     <module>
@@ -81,6 +67,23 @@
         <node>localhost</node>
     </module>
 
+     <module>
+        <name>yarpOpenPose</name>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /mono --x 320 --y 720 --p 50 --autosize</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /confidence --x 960 --y 370 --p 50</parameters>
+        <node>localhost</node>
+    </module>
+    <!--PPS modules-->
 
 
 	<ensure>
@@ -95,7 +98,7 @@
     <connection>
         <from>/skeleton2D/dispSkeleton:o</from>
         <to>/dispSkeleton:i</to>
-        <protocol>udp</protocol>
+        <protocol>fast_tcp</protocol>
     </connection>
 
     <connection>
@@ -104,10 +107,30 @@
         <protocol>udp</protocol>
     </connection>
 
+    <!--yarpOpenPose connections-->
     <connection>
-        <from>/rc_img_conveyor/mono</from>
-        <to>/mono</to>
+        <from>/rc_img_conveyor/color</from>
+        <to>/yarpOpenPose/image:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/yarpOpenPose/image:o</from>
+        <to>/dispSkeleton:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/yarpOpenPose/target:o</from>
+        <to>/skeleton3D/bodyParts:i</to>
         <protocol>udp</protocol>
+    </connection>
+
+    <!-- Tool connection-->
+    <connection>
+        <from>/skeleton3D/askTool:rpc</from>
+        <to>/onTheFlyRecognition/human:io</to>
+        <protocol>tcp</protocol>
     </connection>
 
     <connection>
@@ -119,6 +142,13 @@
     <connection>
         <from>/rc_img_conveyor/disp</from>
         <to>/disp</to>
+        <protocol>udp</protocol>
+    </connection>
+
+
+    <connection>
+        <from>/rc_img_conveyor/mono</from>
+        <to>/mono</to>
         <protocol>udp</protocol>
     </connection>
 
