@@ -116,12 +116,12 @@ bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yar
     }
     else if (!buffer->getImagePresent())
     {
-        yError() << "getBuffer(): Received buffer without image";
+        yError() << "getBuffer8(): Received buffer without image";
         return false;
     }
     else if (buffer->getIsIncomplete())
     {
-        yError() << "getBuffer(): Received buffer without image";
+        yError() << "getBuffer8(): Received buffer without image";
         return false;
     }
     return true;
@@ -166,12 +166,12 @@ bool rcYarpWrapper::getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &
     }
     else if (!buffer->getImagePresent())
     {
-        yError() << "getBuffer(): Received buffer without image";
+        yError() << "getBuffer8andCvtColor(): Received buffer without image";
         return false;
     }
     else if (buffer->getIsIncomplete())
     {
-        yError() << "getBuffer(): Received buffer without image";
+        yError() << "getBuffer8andCvtColor(): Received buffer without image";
         return false;
     }
     return true;
@@ -216,12 +216,12 @@ bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, ya
     }
     else if (!buffer->getImagePresent())
     {
-        yError() << "getBuffer(): Received buffer without image";
+        yError() << "getBuffer16(): Received buffer without image";
         return false;
     }
     else if (buffer->getIsIncomplete())
     {
-        yError() << "getBuffer(): Received buffer without image";
+        yError() << "getBuffer16(): Received buffer without image";
         return false;
     }
     return true;
@@ -437,13 +437,6 @@ bool    rcYarpWrapper::updateModule()
                         ImageOf<PixelMono> img;
                         if(getBuffer8(buffer, scale,img))   // mono image has size of 240x320
                         {
-//                            ImageOf<PixelMono> img= getBuffer8(buffer, scale);
-//                            if (format == Mono8)
-//                            {
-//                                //TODO: export image to monochrome port
-//                                port_mono.prepare() = img;
-//                                port_mono.write();
-//                            }
                             if (format == Confidence8)
                             {
                                 port_conf.prepare() = img;
@@ -460,11 +453,8 @@ bool    rcYarpWrapper::updateModule()
                     case Coord3D_C16: // store 16 bit monochrome image
                     {
 //                        ImageOf<PixelMono16> img;
-                        if (getBuffer16(buffer, 1, imgDisp))        // Disparity map has size of 480x640
+                        if (getBuffer16(buffer, 1, imgDisp))        // Disparity map has size of 240x320
                         {
-    //                        ImageOf<PixelMono16> img= getBuffer16(buffer, 1);
-                            // copy image data, pgm is always big endian
-                            //TODO: export image to disparity port
                             port_disp.prepare() = imgDisp;
                             port_disp.write();
                             Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);

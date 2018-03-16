@@ -87,7 +87,7 @@ public:
 //        int16_t tly_temp = int16_t(tly*imgDisp.height()/imgColor.height());
 
 //        yInfo("[%s] converted: Rect %d %d %d %d %d", name.c_str(), tlx_temp, tly_temp, w, h, step);
-        if (tlx>=0 && tly>=0 && w>=0 && h>=0)
+        if (tlx>0 && tly>0 && w>=0 && h>=0)
         {
             yarp::sig::Vector tl(2,0.0), br(2,0.0), pt3D(3,0.0);
             tl[0] = tlx;
