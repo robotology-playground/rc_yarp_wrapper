@@ -48,7 +48,7 @@
     </module>
     <module>
         <name>skeleton3D</name>
-        <parameters>--depth_rpc /rc_img_conveyor/rpc --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 9 --use_part_conf 0 --period 0.01 --body_valence 0.0 --draw_lower 1</parameters>
+        <parameters>--depth_rpc /rc_img_conveyor/rpc --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 17 --use_part_conf 0 --period 0.01 --body_valence 0.0 --draw_lower 1 --filter_order_angle 7</parameters>
         <dependencies>
             <port timeout="10">/OPC/rpc</port>
             <port timeout="10">/rc_img_conveyor/rpc</port>
@@ -130,6 +130,12 @@
     <connection>
         <from>/skeleton3D/askTool:rpc</from>
         <to>/onTheFlyRecognition/human:io</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/onTheFlyRecognition/class:o</from>
+        <to>/skeleton3D/toolClass:i</to>
         <protocol>tcp</protocol>
     </connection>
 
