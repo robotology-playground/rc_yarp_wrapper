@@ -100,8 +100,8 @@ bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yar
         cv::Mat image(height,width,imgType);
         image.data = (unsigned char*) p;
 
-        yarpReturnImage.resize(int(width/mScale),int(height/mScale)));
-        cv::Mat dst=cv2arrMat((*IplImage)yarpReturnImage.getIplImage());
+        yarpReturnImage.resize(int(width/mScale),int(height/mScale));
+        cv::Mat dst=cv::cvarrToMat(yarpReturnImage.getIplImage());
         cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
     }
     else if (!buffer->getImagePresent())
@@ -140,8 +140,8 @@ bool rcYarpWrapper::getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &
         cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
 
         // Convert to fake color
-        yarpReturnImage.resize(int(width/mScale),int(height/mScale)));
-        cv::Mat color_image=cv2arrMat((*IplImage)yarpReturnImage.getIplImage());
+        yarpReturnImage.resize(int(width/mScale),int(height/mScale));
+        cv::Mat color_image=cv::cvarrToMat(yarpReturnImage.getIplImage());
         cv::cvtColor(dst,color_image,CV_GRAY2RGB);
     }
     else if (!buffer->getImagePresent())
@@ -175,8 +175,8 @@ bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, ya
         cv::Mat image(height,width,imgType);
         image.data = (unsigned char*) p;
 
-        yarpReturnImage.resize(int(width/mScale),int(height/mScale)));
-        cv::Mat dst=cv2arrMat((*IplImage)yarpReturnImage.getIplImage());
+        yarpReturnImage.resize(int(width/mScale),int(height/mScale));
+        cv::Mat dst=cv::cvarrToMat(yarpReturnImage.getIplImage());
         cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
 
         // TODO
