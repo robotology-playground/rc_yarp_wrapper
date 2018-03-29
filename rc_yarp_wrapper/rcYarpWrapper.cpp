@@ -98,21 +98,11 @@ bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yar
         imgDepth = 8;
 
         cv::Mat image(height,width,imgType);
-        cv::Mat dst;
-
         image.data = (unsigned char*) p;
 
+        yarpReturnImage.resize(int(width/mScale),int(height/mScale)));
+        cv::Mat dst=cv2arrMat((*IplImage)yarpReturnImage.getIplImage());
         cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
-//        cv::resize(image, dst, cv::Size(int(height/mScale),int(width/mScale)));
-
-        IplImage* image2;
-        image2 = cvCreateImage(cv::Size(int(width/mScale),int(height/mScale)),imgDepth,1);
-//        image2 = cvCreateImage(cv::Size(int(height/mScale),int(width/mScale)),imgDepth,1);
-        IplImage ipltemp=dst;
-        cvCopy(&ipltemp,image2);
-
-        yarpReturnImage.wrapIplImage(image2);
-
     }
     else if (!buffer->getImagePresent())
     {
@@ -144,25 +134,15 @@ bool rcYarpWrapper::getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &
         imgDepth = 8;
 
         cv::Mat image(height,width,imgType);
-        cv::Mat dst;
-
         image.data = (unsigned char*) p;
 
+        cv::Mat dst;
         cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
 
         // Convert to fake color
-        cv::Mat color_image;
+        yarpReturnImage.resize(int(width/mScale),int(height/mScale)));
+        cv::Mat color_image=cv2arrMat((*IplImage)yarpReturnImage.getIplImage());
         cv::cvtColor(dst,color_image,CV_GRAY2RGB);
-
-        // Mat to IplImage
-        IplImage* image2;
-        image2 = cvCreateImage(cv::Size(int(width/mScale),int(height/mScale)),imgDepth,3);
-        IplImage ipltemp=color_image;
-        cvCopy(&ipltemp,image2);
-
-
-        yarpReturnImage.wrapIplImage(image2);
-
     }
     else if (!buffer->getImagePresent())
     {
@@ -193,18 +173,12 @@ bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, ya
         imgDepth = 16;
 
         cv::Mat image(height,width,imgType);
-        cv::Mat dst;
-
         image.data = (unsigned char*) p;
 
+        yarpReturnImage.resize(int(width/mScale),int(height/mScale)));
+        cv::Mat dst=cv2arrMat((*IplImage)yarpReturnImage.getIplImage());
         cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
 
-        IplImage* image2;
-        image2 = cvCreateImage(cvSize(int(width/mScale),int(height/mScale)),imgDepth,1);
-        IplImage ipltemp=dst;
-        cvCopy(&ipltemp,image2);
-
-        yarpReturnImage.wrapIplImage(image2);
         // TODO
         if (buffer->isBigEndian())
         {
@@ -212,7 +186,6 @@ bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, ya
         else
         {
         }
-
     }
     else if (!buffer->getImagePresent())
     {
@@ -323,7 +296,6 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
             yError("[%s] No stream available",name.c_str());
             return false;
         }
-
     }
     else
     {
@@ -343,7 +315,6 @@ bool    rcYarpWrapper::configure(ResourceFinder &rf)
         }
         else
             yWarning("[%s] Found %s  in the config file but it is empty; using default", name.c_str(), "calibrator");
-
     }
     else
     {
