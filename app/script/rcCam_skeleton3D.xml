@@ -5,7 +5,7 @@
 
     <module>
         <name>iCubGui</name>
-        <parameters>--xpos 1300 --ypos 0 --width 600 --height 930</parameters>
+        <parameters>--xpos 1300 --ypos 0 --width 600 --height 700</parameters>
         <node>localhost</node>
         <tag>iCubGui</tag>
     </module>
@@ -22,28 +22,15 @@
         <node>localhost</node>
     </module>
 
-    <module>
-        <name>skeleton2D.py</name>
-        <parameters>--des /skeleton2D --src /rc_img_conveyor/color</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpview</name>
-        <parameters>--name /disp  --x 960 --y 720 --p 50</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpview</name>
-        <parameters>--name /color --x 320 --y 720 --p 50 --autosize</parameters>
+     <module>
+        <name>yarpOpenPose</name>
         <node>localhost</node>
     </module>
 
     <!--Skeleton modules-->
     <module>
         <name>yarpview</name>
-        <parameters>--name /dispSkeleton:i --x 640 --y 720 --p 50</parameters>
+        <parameters>--name /dispSkeleton:i --x 400 --y 750 --p 50</parameters>
         <node>localhost</node>
     </module>
     <module>
@@ -59,6 +46,18 @@
 
     <!--GUI modules-->
     <module>
+        <name>yarpview</name>
+        <parameters>--name /color --x 100 --y 750 --p 50 --autosize</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /disp  --x 960 --y 750 --p 50</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
         <name>guiUpdater</name>
         <parameters>--displaySkeletons 1</parameters>
         <dependencies>
@@ -67,14 +66,9 @@
         <node>localhost</node>
     </module>
 
-     <module>
-        <name>yarpOpenPose</name>
-        <node>localhost</node>
-    </module>
-
     <module>
         <name>yarpview</name>
-        <parameters>--name /mono --x 320 --y 720 --p 50 --autosize</parameters>
+        <parameters>--name /mono --x 400 --y 450 --p 50 --autosize</parameters>
         <node>localhost</node>
     </module>
 
@@ -85,6 +79,11 @@
     </module>
     <!--PPS modules-->
 
+    <module>
+        <name>skeleton2D.py</name>
+        <parameters>--des /skeleton2D --src /rc_img_conveyor/color</parameters>
+        <node>localhost</node>
+    </module>
 
 	<ensure>
 		<wait>5.0</wait>
