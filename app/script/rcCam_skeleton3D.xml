@@ -140,6 +140,12 @@
     </connection>
 
     <connection>
+        <from>/onTheFlyRecognition_left/class:o</from>
+        <to>/skeleton3D/toolClass_left:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
         <from>/rc_img_conveyor/color</from>
         <to>/color</to>
         <protocol>udp</protocol>
