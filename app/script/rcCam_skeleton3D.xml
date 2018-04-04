@@ -24,6 +24,10 @@
 
      <module>
         <name>yarpOpenPose</name>
+        <dependencies>
+            <port timeout="10">/onTheFlyRecognition/class:o</port>
+            <port timeout="10">/onTheFlyRecognition_left/class:o</port>
+        </dependencies>
         <node>localhost</node>
     </module>
 
@@ -35,11 +39,11 @@
     </module>
     <module>
         <name>skeleton3D</name>
-        <parameters>--depth_rpc /rc_img_conveyor/rpc --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 17 --use_part_conf 0 --period 0.01 --body_valence 0.0 --draw_lower 1 --filter_order_angle 7</parameters>
+        <parameters>--depth_rpc /rc_img_conveyor/rpc --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 17 --use_part_conf 0 --period 0.0 --body_valence 0.0 --draw_lower 1 --filter_order_angle 9 --radius 2</parameters>
         <dependencies>
             <port timeout="10">/OPC/rpc</port>
             <port timeout="10">/rc_img_conveyor/rpc</port>
-            <port timeout="10">/skeleton2D/bodyParts:o</port>
+            <port timeout="10">/yarpOpenPose/target:o</port>
         </dependencies>
         <node>localhost</node>
     </module>
@@ -91,21 +95,6 @@
 
     <!--PPS connections-->
 
-
-
-    <!--Skeleton connections-->
-    <connection>
-        <from>/skeleton2D/dispSkeleton:o</from>
-        <to>/dispSkeleton:i</to>
-        <protocol>fast_tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/skeleton2D/bodyParts:o</from>
-        <to>/skeleton3D/bodyParts:i</to>
-        <protocol>udp</protocol>
-    </connection>
-
     <!--yarpOpenPose connections-->
     <connection>
         <from>/rc_img_conveyor/color</from>
@@ -156,6 +145,20 @@
         <protocol>udp</protocol>
     </connection>
 
+
+
+    <!--Skeleton connections-->
+    <connection>
+        <from>/skeleton2D/dispSkeleton:o</from>
+        <to>/dispSkeleton:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/skeleton2D/bodyParts:o</from>
+        <to>/skeleton3D/bodyParts:i</to>
+        <protocol>udp</protocol>
+    </connection>
 
     <connection>
         <from>/rc_img_conveyor/mono</from>
