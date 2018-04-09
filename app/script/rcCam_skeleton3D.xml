@@ -133,6 +133,19 @@
         <protocol>tcp</protocol>
     </connection>
 
+    <!-- On the fly connection-->
+    <connection>
+        <from>/skeleton3D/handBlobs:o</from>
+        <to>/onTheFlyRecognition/blobs:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/skeleton3D/handBlobs_left:o</from>
+        <to>/onTheFlyRecognition_left/blobs:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
     <connection>
         <from>/rc_img_conveyor/color</from>
         <to>/color</to>
@@ -171,6 +184,7 @@
         <to>/confidence</to>
         <protocol>udp</protocol>
     </connection>
+
 
 </application>
 

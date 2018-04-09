@@ -12,7 +12,7 @@
           
     <module>
         <name>managerOnTheFly</name>    
-        <parameters>--radius_human 30</parameters>           
+        <parameters>--radius_human 20</parameters>           
         <node>localhost</node>
     </module>
 
@@ -44,7 +44,7 @@
           
     <module>
         <name>managerOnTheFly</name>   
-	<parameters>--name onTheFlyRecognition_left --radius_human 30</parameters>            
+	<parameters>--name onTheFlyRecognition_left --radius_human 20</parameters>            
         <node>localhost</node>
     </module>
 
