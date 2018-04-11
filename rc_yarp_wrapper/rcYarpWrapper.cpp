@@ -4,11 +4,6 @@ using namespace std;
 using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::math;
-//using namespace iCub::ctrl;
-//rcYarpWrapper::rcYarpWrapper()
-//{
-
-//}
 bool rcYarpWrapper::compute3DCoorRect(const yarp::sig::ImageOf<PixelMono16> &dispImg, const Vector &tlPixel,
                                       const Vector &brPixel, const int &step,
                                       Vector &point3D)
@@ -370,7 +365,6 @@ bool    rcYarpWrapper::close()
 bool    rcYarpWrapper::attach(RpcServer &source)
 {
     return this->yarp().attachAsServer(source);
-//    return true;
 }
 
 double  rcYarpWrapper::getPeriod()
@@ -395,7 +389,6 @@ bool    rcYarpWrapper::updateModule()
                 {
                     case Mono8:
                     {
-//                        ImageOf<PixelRgb> img;
                         if (getBuffer8andCvtColor(buffer, scale, imgColor)) // color image has size of 240x320
                         {
                             port_color.prepare() = imgColor;
@@ -423,22 +416,10 @@ bool    rcYarpWrapper::updateModule()
 
                     case Coord3D_C16: // store 16 bit monochrome image
                     {
-//                        ImageOf<PixelMono16> img;
                         if (getBuffer16(buffer, 1, imgDisp))        // Disparity map has size of 240x320
                         {
                             port_disp.prepare() = imgDisp;
                             port_disp.write();
-                            Vector pixel(2,0.0), p_tl(2,0.0),p_br(2,0.0), pt3D(3,0.0);
-                            pixel[0] = int(imgDisp.width()/2.0); //col
-                            pixel[1] = int(imgDisp.height()/2.0); //row
-//                            pixel[1] = 200;
-//                            compute3DCoor(imgDisp,pixel, pt3D);
-
-                            p_tl = pixel-1;
-                            p_br = pixel+1;
-                            if (compute3DCoorRect(imgDisp,p_tl,p_br,1,pt3D))
-                                yInfo("3D coordinator of [%s] pixel of disp image: %s",pixel.toString(3,3).c_str(),
-                                    pt3D.toString(3,3).c_str());
                         }
 
                     }
