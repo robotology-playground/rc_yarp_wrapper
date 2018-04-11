@@ -28,7 +28,7 @@
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /onTheFlyRecognition/view --x 1300 --y 750</parameters>
+        <parameters>--name /onTheFlyRecognition/view --x 300 --y 0 --w 700 --h 700</parameters>
         <node>localhost</node>
     </module>
 
@@ -62,7 +62,7 @@
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /onTheFlyRecognition_left/view --x 1600 --y 750</parameters>
+        <parameters>--name /onTheFlyRecognition_left/view --x 1000 --y  0 --w 700 --h 700</parameters>
         <node>localhost</node>
     </module>
 
