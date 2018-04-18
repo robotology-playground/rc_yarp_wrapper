@@ -126,6 +126,12 @@
         <protocol>udp</protocol>
     </connection>
 
+    <connection>
+        <from>/skeleton3D/get3d:rpc</from>
+        <to>/rc_img_conveyor/rpc</to>
+        <protocol>tcp</protocol>
+    </connection>
+
     <!-- Tool connection-->
     <connection>
         <from>/skeleton3D/askTool:rpc</from>
