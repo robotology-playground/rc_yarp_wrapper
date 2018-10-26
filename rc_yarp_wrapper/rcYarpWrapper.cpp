@@ -76,18 +76,20 @@ bool rcYarpWrapper::compute3DCoor(const yarp::sig::ImageOf<PixelMono16> &dispImg
 }
 
 
-bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono> &yarpReturnImage)
+bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono> &yarpReturnImage,
+                               const uint32_t &partId)
 {
     // prepare file name
 
     double t=buffer->getTimestampNS()/1000000000.0;
 
-    if (!buffer->getIsIncomplete() && buffer->getImagePresent())
+    if (!buffer->getIsIncomplete() && buffer->getImagePresent(partId))
     {
         int mScale = _scale;
-        size_t width=buffer->getWidth();
-        size_t height=buffer->getHeight();
-        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
+        size_t width=buffer->getWidth(partId);
+        size_t height=buffer->getHeight(partId);
+//        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(partId))+buffer->getImageOffset();
+        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(partId));
         int imgType, imgDepth;
         imgType = CV_8U;
         imgDepth = 8;
@@ -99,7 +101,7 @@ bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yar
         cv::Mat dst=cv::cvarrToMat(yarpReturnImage.getIplImage());
         cv::resize(image, dst, cvSize(int(width/mScale),int(height/mScale)));
     }
-    else if (!buffer->getImagePresent())
+    else if (!buffer->getImagePresent(partId))
     {
         yError() << "getBuffer8(): Received buffer without image";
         return false;
@@ -112,18 +114,20 @@ bool rcYarpWrapper::getBuffer8(const rcg::Buffer *buffer, const int &_scale, yar
     return true;
 }
 
-bool rcYarpWrapper::getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelRgb> &yarpReturnImage)
+bool rcYarpWrapper::getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelRgb> &yarpReturnImage,
+                                          const uint32_t &partId)
 {
     // prepare file name
 
     double t=buffer->getTimestampNS()/1000000000.0;
 
-    if (!buffer->getIsIncomplete() && buffer->getImagePresent())
+    if (!buffer->getIsIncomplete() && buffer->getImagePresent(partId))
     {
         int mScale = _scale;
-        size_t width=buffer->getWidth();
-        size_t height=buffer->getHeight();
-        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
+        size_t width=buffer->getWidth(partId);
+        size_t height=buffer->getHeight(partId);
+//        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(partId))+buffer->getImageOffset();
+        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(partId));
         int imgType, imgDepth;
         imgType = CV_8U;
         imgDepth = 8;
@@ -139,7 +143,7 @@ bool rcYarpWrapper::getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &
         cv::Mat color_image=cv::cvarrToMat(yarpReturnImage.getIplImage());
         cv::cvtColor(dst,color_image,CV_GRAY2RGB);
     }
-    else if (!buffer->getImagePresent())
+    else if (!buffer->getImagePresent(partId))
     {
         yError() << "getBuffer8andCvtColor(): Received buffer without image";
         return false;
@@ -152,17 +156,19 @@ bool rcYarpWrapper::getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &
     return true;
 }
 
-bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono16> &yarpReturnImage)
+bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<PixelMono16> &yarpReturnImage,
+                                const uint32_t &partId)
 {
     // prepare file name
     double t=buffer->getTimestampNS()/1000000000.0;
 
-    if (!buffer->getIsIncomplete() && buffer->getImagePresent())
+    if (!buffer->getIsIncomplete() && buffer->getImagePresent(partId))
     {
         int mScale = _scale;
-        size_t width=buffer->getWidth();
-        size_t height=buffer->getHeight();
-        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase())+buffer->getImageOffset();
+        size_t width=buffer->getWidth(partId);
+        size_t height=buffer->getHeight(partId);
+//        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(partId))+buffer->getImageOffset();
+        const unsigned char *p=static_cast<const unsigned char *>(buffer->getBase(partId));
         int imgType, imgDepth;
         imgType = CV_16U;
         imgDepth = 16;
@@ -182,7 +188,7 @@ bool rcYarpWrapper::getBuffer16(const rcg::Buffer *buffer, const int &_scale, ya
         {
         }
     }
-    else if (!buffer->getImagePresent())
+    else if (!buffer->getImagePresent(partId))
     {
         yError() << "getBuffer16(): Received buffer without image";
         return false;
@@ -383,13 +389,14 @@ bool    rcYarpWrapper::updateModule()
 
         if (buffer !=0)
         {
+                uint32_t partId = buffer->getNumberOfParts();
 
-                uint64_t format=buffer->getPixelFormat();
+                uint64_t format=buffer->getPixelFormat(partId);
                 switch (format)
                 {
                     case Mono8:
                     {
-                        if (getBuffer8andCvtColor(buffer, scale, imgColor)) // color image has size of 240x320
+                        if (getBuffer8andCvtColor(buffer, scale, imgColor, partId)) // color image has size of 240x320
                         {
                             port_color.prepare() = imgColor;
                             port_color.write();
@@ -399,7 +406,7 @@ bool    rcYarpWrapper::updateModule()
                     case Error8:
                     {
                         ImageOf<PixelMono> img;
-                        if(getBuffer8(buffer, scale,img))   // mono image has size of 240x320
+                        if(getBuffer8(buffer, scale,img, partId))   // mono image has size of 240x320
                         {
                             if (format == Confidence8)
                             {
@@ -416,7 +423,7 @@ bool    rcYarpWrapper::updateModule()
 
                     case Coord3D_C16: // store 16 bit monochrome image
                     {
-                        if (getBuffer16(buffer, 1, imgDisp))        // Disparity map has size of 240x320
+                        if (getBuffer16(buffer, 1, imgDisp, partId))        // Disparity map has size of 240x320
                         {
                             port_disp.prepare() = imgDisp;
                             port_disp.write();

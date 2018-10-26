@@ -69,13 +69,16 @@ public:
 //    bool getBuffer(const rcg::Buffer *buffer, const int &_scale, yarp::sig::ImageOf<T> &yarpReturnImage);
 
     bool getBuffer8(const rcg::Buffer *buffer, const int &_scale,
-                    yarp::sig::ImageOf<yarp::sig::PixelMono> &yarpReturnImage);
+                    yarp::sig::ImageOf<yarp::sig::PixelMono> &yarpReturnImage,
+                    const uint32_t &partId);
 
     bool getBuffer8andCvtColor(const rcg::Buffer *buffer, const int &_scale,
-                               yarp::sig::ImageOf<yarp::sig::PixelRgb> &yarpReturnImage);
+                               yarp::sig::ImageOf<yarp::sig::PixelRgb> &yarpReturnImage,
+                               const uint32_t &partId);
 
     bool getBuffer16(const rcg::Buffer *buffer, const int &_scale,
-                     yarp::sig::ImageOf<yarp::sig::PixelMono16> &yarpReturnImage);
+                     yarp::sig::ImageOf<yarp::sig::PixelMono16> &yarpReturnImage,
+                     const uint32_t &partId);
     /************************************************************************/
     // Thrift methods
     Point3D Rect(const int16_t tlx, const int16_t tly, const int16_t w, const int16_t h, const int16_t step)
