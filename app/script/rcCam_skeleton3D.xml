@@ -18,16 +18,17 @@
      <!--SFM modules-->
     <module>
         <name>rc_yarp_wrapper</name>
-        <parameters>--device enp0s31f6:00_14_2d_2c_70_01 --error 1 --confidence 1</parameters>
+        <parameters>--device devicemodul00_14_2d_2c_d5_1e --error 1 --confidence 1</parameters>
         <node>localhost</node>
     </module>
 
      <module>
         <name>yarpOpenPose</name>
-        <dependencies>
+<!--        <dependencies>
             <port timeout="10">/onTheFlyRecognition/class:o</port>
             <port timeout="10">/onTheFlyRecognition_left/class:o</port>
         </dependencies>
+-->
         <node>localhost</node>
     </module>
 
@@ -167,13 +168,13 @@
     <!-- On the fly connection-->
     <connection>
         <from>/skeleton3D/handBlobs:o</from>
-        <to>/onTheFlyRecognition/blobs:i</to>
+        <to>/onTheFlyRecognition/roi:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/skeleton3D/handBlobs_left:o</from>
-        <to>/onTheFlyRecognition_left/blobs:i</to>
+        <to>/onTheFlyRecognition_left/roi:i</to>
         <protocol>tcp</protocol>
     </connection>
 

@@ -11,7 +11,7 @@
 
           
     <module>
-        <name>managerOnTheFly</name>    
+        <name>managerOTFR</name>    
         <parameters>--radius_human 20</parameters>           
         <node>localhost</node>
     </module>
@@ -43,7 +43,7 @@
 
           
     <module>
-        <name>managerOnTheFly</name>   
+        <name>managerOTFR</name>   
 	<parameters>--name onTheFlyRecognition_left --radius_human 20</parameters>            
         <node>localhost</node>
     </module>
@@ -85,7 +85,7 @@
 
     <connection>
         <from>/skeleton3D/handBlobs:o</from>
-        <to>/onTheFlyRecognition/blobs:i</to>
+        <to>/onTheFlyRecognition/roi:i</to>
         <protocol>tcp</protocol>
     </connection>
 
@@ -145,7 +145,7 @@
 
     <connection>
         <from>/skeleton3D/handBlobs_left:o</from>
-        <to>/onTheFlyRecognition_left/blobs:i</to>
+        <to>/onTheFlyRecognition_left/roi:i</to>
         <protocol>tcp</protocol>
     </connection>
 
