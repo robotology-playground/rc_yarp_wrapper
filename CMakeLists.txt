@@ -20,8 +20,6 @@ find_package(ICUBcontrib REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(RC_GENICAM_API REQUIRED)
 
-message(STATUS ${RC_GENICAM_API_DIR})
-
 list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${ICUBCONTRIB_MODULE_PATH})
@@ -40,7 +38,7 @@ set(main_project_path ${CMAKE_CURRENT_SOURCE_DIR})
 #add_subdirectory(modules)
 
 add_subdirectory(app)
-add_subdirectory(test)
+#add_subdirectory(test)
 add_subdirectory(rc_yarp_wrapper)
 
 

@@ -53,7 +53,7 @@
 
     <module>
         <name>skeleton3D</name>
-        <parameters>--depth_rpc /rc_img_conveyor/rpc --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 17 --use_part_conf 0 --period 0.0 --body_valence 0.0 --draw_lower 1 --filter_order_angle 7 --radius 2 --workspace_x 1.9 --workspace_y 1.2</parameters>
+        <parameters>--depth_rpc /rc_img_conveyor/rpc --address_udp_kuka 192.168.2.96 --port_udp_kuka 60000 --address_udp_viz 192.168.2.62 --port_udp_viz 44000 --dThresholdDisparition 10.0 --part_dimension 0.07 --filter_order 17 --use_part_conf 0 --period 0.0 --body_valence 0.0 --draw_lower 1 --filter_order_angle 7 --radius 2 --workspace_x 1.9 --workspace_y 1.2</parameters>
         <dependencies>
             <port timeout="10">/OPC/rpc</port>
             <port timeout="10">/rc_img_conveyor/rpc</port>
