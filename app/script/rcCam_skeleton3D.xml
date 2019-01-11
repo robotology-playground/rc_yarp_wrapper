@@ -96,13 +96,13 @@
         <node>localhost</node>
     </module>
     <!--PPS modules-->
-
+<!--
     <module>
         <name>skeleton2D.py</name>
         <parameters>--des /skeleton2D --src /rc_img_conveyor/color</parameters>
         <node>localhost</node>
     </module>
-
+-->
 	<ensure>
 		<wait>5.0</wait>
 	</ensure>
