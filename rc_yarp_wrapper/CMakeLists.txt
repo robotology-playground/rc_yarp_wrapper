@@ -15,20 +15,16 @@ include(YarpIDL)
 set (include_files	${CMAKE_CURRENT_SOURCE_DIR}/rcYarpWrapper.h)
 
 
-set (source_files 	${CMAKE_CURRENT_SOURCE_DIR}/rcYarpWrapper.cpp
+set (source_files	${CMAKE_CURRENT_SOURCE_DIR}/rcYarpWrapper.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/runModule.cpp
-#                        ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
                         )
+
+message(STATUS ${RC_GENICAM_API_INCLUDE_DIRS})
+message(STATUS ${RC_GENICAM_API_LIBRARY_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS}
-					#${RC_GENICAM_API_DIRS}
-					#${RC_GENICAM_API_LIBRARIES}
-					#${RC_GENICAM_API_INCLUDES}
-					/home/pnguyen/.local/include
-					/home/pnguyen/.local/include/rc_genicam_api/genicam
-					)
+                    ${RC_GENICAM_API_INCLUDE_DIRS})
 include_directories(${YARP_INCLUDE_DIRS}
                     ${ICUB_INCLUDE_DIRS})
-#include_directories(${main_project_path}/lib/include)
 
 source_group("Source Files" FILES ${source})
 source_group("Header Files" FILES ${header})
@@ -41,9 +37,9 @@ source_group("IDL Files" FILES ${idl_files})
 
 add_definitions(-D_USE_MATH_DEFINES)
 
-add_executable(rc_yarp_wrapper ${source} ${header} ${source_files} ${RC_GENICAM_API_DIR} ${include_files} ${IDL_GEN_FILES} ${idl_files}) #${lib_files})# ${source_files} ${include_files} )
+add_executable(rc_yarp_wrapper ${source} ${header} ${source_files} ${RC_GENICAM_API_DIR} ${include_files} ${IDL_GEN_FILES} ${idl_files}) 
 
-target_link_libraries(rc_yarp_wrapper ${YARP_LIBRARIES} ${OpenCV_LIBRARIES} ${RC_GENICAM_API_LIBRARIES} ${RC_GENICAM_API_DIR})
+target_link_libraries(rc_yarp_wrapper ${YARP_LIBRARIES} ${OpenCV_LIBRARIES} ${RC_GENICAM_API_LIBRARIES})
 
 install(TARGETS rc_yarp_wrapper DESTINATION bin)
 

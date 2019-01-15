@@ -7,6 +7,14 @@
 1. [Yarp](https://github.com/robotology/yarp)
 2. [rc_genicam_api](https://github.com/roboception/rc_genicam_api)
 
+## Build
+1. Build and Install **rc_genicam_api**. Remember to add its library path to the *.bashrc* file, e.g. in the case **rc_genicam_api** has been installed in `~/.local`
+```
+	export LIBRARY_PATH=$LIBRARY_PATH:~/.local/lib:~/.local/lib/rc_genicam_api
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.local/lib:~/.local/lib/rc_genicam_api
+```
+2. Build and install this repo normally
+
 ## How to
 1. Run [rcdiscover-gui](https://github.com/roboception/rcdiscover) to look for the camera(s)
 2. Run `gc_config -l` to get the name of camera(s) which you want to connect to.
